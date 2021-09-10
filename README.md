@@ -70,6 +70,7 @@ command.
 Finally to install the Services Hub VPC Cloudformation Template
 ```
 cdk deploy <Stack-Name> ProServeApgCentralisedVpcEndpointsHubStack --parameters VPCId=vpc-xxxxxxxxx --parameters OrgCIDR=xx.xx.xx.xx/xx --parameters EndpointSubnetIdList="subnet-xxxxxxxxx, subnet-xxxxxxxxxx, subnet-xxxxxxx"
+```
 
 =======
 >>>>>>> 3890023... Update README.md
