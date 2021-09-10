@@ -1,0 +1,334 @@
+{
+  "version": "14.0.0",
+  "artifacts": {
+    "Tree": {
+      "type": "cdk:tree",
+      "properties": {
+        "file": "tree.json"
+      }
+    },
+    "ProServeApgCentralisedVpcEndpointsHubStack": {
+      "type": "aws:cloudformation:stack",
+      "environment": "aws://unknown-account/unknown-region",
+      "properties": {
+        "templateFile": "ProServeApgCentralisedVpcEndpointsHubStack.template.json",
+        "validateOnSynth": false
+      },
+      "metadata": {
+        "/ProServeApgCentralisedVpcEndpointsHubStack/VPCId": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "VPCId",
+            "trace": [
+              "/tmp/tmpseke2il_/lib/program.js:8367:58",
+              "Kernel._wrapSandboxCode (/tmp/tmpseke2il_/lib/program.js:8795:24)",
+              "Kernel._create (/tmp/tmpseke2il_/lib/program.js:8367:34)",
+              "Kernel.create (/tmp/tmpseke2il_/lib/program.js:8108:29)",
+              "KernelHost.processRequest (/tmp/tmpseke2il_/lib/program.js:9692:36)",
+              "KernelHost.run (/tmp/tmpseke2il_/lib/program.js:9655:22)",
+              "Immediate._onImmediate (/tmp/tmpseke2il_/lib/program.js:9656:46)",
+              "processImmediate (internal/timers.js:464:21)"
+            ]
+          }
+        ],
+        "/ProServeApgCentralisedVpcEndpointsHubStack/OrgCIDR": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "OrgCIDR",
+            "trace": [
+              "/tmp/tmpseke2il_/lib/program.js:8367:58",
+              "Kernel._wrapSandboxCode (/tmp/tmpseke2il_/lib/program.js:8795:24)",
+              "Kernel._create (/tmp/tmpseke2il_/lib/program.js:8367:34)",
+              "Kernel.create (/tmp/tmpseke2il_/lib/program.js:8108:29)",
+              "KernelHost.processRequest (/tmp/tmpseke2il_/lib/program.js:9692:36)",
+              "KernelHost.run (/tmp/tmpseke2il_/lib/program.js:9655:22)",
+              "Immediate._onImmediate (/tmp/tmpseke2il_/lib/program.js:9656:46)",
+              "processImmediate (internal/timers.js:464:21)"
+            ]
+          }
+        ],
+        "/ProServeApgCentralisedVpcEndpointsHubStack/EndpointSubnetIdList": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "EndpointSubnetIdList",
+            "trace": [
+              "/tmp/tmpseke2il_/lib/program.js:8367:58",
+              "Kernel._wrapSandboxCode (/tmp/tmpseke2il_/lib/program.js:8795:24)",
+              "Kernel._create (/tmp/tmpseke2il_/lib/program.js:8367:34)",
+              "Kernel.create (/tmp/tmpseke2il_/lib/program.js:8108:29)",
+              "KernelHost.processRequest (/tmp/tmpseke2il_/lib/program.js:9692:36)",
+              "KernelHost.run (/tmp/tmpseke2il_/lib/program.js:9655:22)",
+              "Immediate._onImmediate (/tmp/tmpseke2il_/lib/program.js:9656:46)",
+              "processImmediate (internal/timers.js:464:21)"
+            ]
+          }
+        ],
+        "/ProServeApgCentralisedVpcEndpointsHubStack/EndpointVPC": [
+          {
+            "type": "aws:cdk:warning",
+            "data": "fromVpcAttributes: 'availabilityZones' is a list token: the imported VPC will not work with constructs that require a list of subnets at synthesis time. Use 'Vpc.fromLookup()' or 'Fn.importListValue' instead.",
+            "trace": [
+              "Annotations.addMessage (/tmp/jsii-kernel-BXgJin/node_modules/@aws-cdk/core/lib/annotations.js:94:42)",
+              "Annotations.addWarning (/tmp/jsii-kernel-BXgJin/node_modules/@aws-cdk/core/lib/annotations.js:37:14)",
+              "new ImportedVpc (/tmp/jsii-kernel-BXgJin/node_modules/@aws-cdk/aws-ec2/lib/vpc.js:940:45)",
+              "Function.fromVpcAttributes (/tmp/jsii-kernel-BXgJin/node_modules/@aws-cdk/aws-ec2/lib/vpc.js:474:16)",
+              "/tmp/tmpseke2il_/lib/program.js:8204:114",
+              "Kernel._wrapSandboxCode (/tmp/tmpseke2il_/lib/program.js:8795:24)",
+              "/tmp/tmpseke2il_/lib/program.js:8204:87",
+              "Kernel._ensureSync (/tmp/tmpseke2il_/lib/program.js:8776:28)",
+              "Kernel.sinvoke (/tmp/tmpseke2il_/lib/program.js:8204:34)",
+              "KernelHost.processRequest (/tmp/tmpseke2il_/lib/program.js:9692:36)",
+              "KernelHost.run (/tmp/tmpseke2il_/lib/program.js:9655:22)",
+              "Immediate._onImmediate (/tmp/tmpseke2il_/lib/program.js:9656:46)",
+              "processImmediate (internal/timers.js:464:21)"
+            ]
+          }
+        ],
+        "/ProServeApgCentralisedVpcEndpointsHubStack/SecurityGroupForEndpoints/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "SecurityGroupForEndpointsF9C56E0E",
+            "trace": [
+              "new SecurityGroup (/tmp/jsii-kernel-BXgJin/node_modules/@aws-cdk/aws-ec2/lib/security-group.js:215:30)",
+              "/tmp/tmpseke2il_/lib/program.js:8367:58",
+              "Kernel._wrapSandboxCode (/tmp/tmpseke2il_/lib/program.js:8795:24)",
+              "Kernel._create (/tmp/tmpseke2il_/lib/program.js:8367:34)",
+              "Kernel.create (/tmp/tmpseke2il_/lib/program.js:8108:29)",
+              "KernelHost.processRequest (/tmp/tmpseke2il_/lib/program.js:9692:36)",
+              "KernelHost.run (/tmp/tmpseke2il_/lib/program.js:9655:22)",
+              "Immediate._onImmediate (/tmp/tmpseke2il_/lib/program.js:9656:46)",
+              "processImmediate (internal/timers.js:464:21)"
+            ]
+          }
+        ],
+        "/ProServeApgCentralisedVpcEndpointsHubStack/EndpointForssm": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "EndpointForssm",
+            "trace": [
+              "/tmp/tmpseke2il_/lib/program.js:8367:58",
+              "Kernel._wrapSandboxCode (/tmp/tmpseke2il_/lib/program.js:8795:24)",
+              "Kernel._create (/tmp/tmpseke2il_/lib/program.js:8367:34)",
+              "Kernel.create (/tmp/tmpseke2il_/lib/program.js:8108:29)",
+              "KernelHost.processRequest (/tmp/tmpseke2il_/lib/program.js:9692:36)",
+              "KernelHost.run (/tmp/tmpseke2il_/lib/program.js:9655:22)",
+              "Immediate._onImmediate (/tmp/tmpseke2il_/lib/program.js:9656:46)",
+              "processImmediate (internal/timers.js:464:21)"
+            ]
+          }
+        ],
+        "/ProServeApgCentralisedVpcEndpointsHubStack/Route53Domainforssm": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "Route53Domainforssm",
+            "trace": [
+              "/tmp/tmpseke2il_/lib/program.js:8367:58",
+              "Kernel._wrapSandboxCode (/tmp/tmpseke2il_/lib/program.js:8795:24)",
+              "Kernel._create (/tmp/tmpseke2il_/lib/program.js:8367:34)",
+              "Kernel.create (/tmp/tmpseke2il_/lib/program.js:8108:29)",
+              "KernelHost.processRequest (/tmp/tmpseke2il_/lib/program.js:9692:36)",
+              "KernelHost.run (/tmp/tmpseke2il_/lib/program.js:9655:22)",
+              "Immediate._onImmediate (/tmp/tmpseke2il_/lib/program.js:9656:46)",
+              "processImmediate (internal/timers.js:464:21)"
+            ]
+          }
+        ],
+        "/ProServeApgCentralisedVpcEndpointsHubStack/CDKMetadata/Default": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "CDKMetadata",
+            "trace": [
+              "new MetadataResource (/tmp/jsii-kernel-BXgJin/node_modules/@aws-cdk/core/lib/private/metadata-resource.js:22:30)",
+              "/tmp/jsii-kernel-BXgJin/node_modules/@aws-cdk/core/lib/private/synthesis.js:139:9",
+              "visit (/tmp/jsii-kernel-BXgJin/node_modules/@aws-cdk/core/lib/private/synthesis.js:200:9)",
+              "visit (/tmp/jsii-kernel-BXgJin/node_modules/@aws-cdk/core/lib/private/synthesis.js:197:9)",
+              "injectMetadataResources (/tmp/jsii-kernel-BXgJin/node_modules/@aws-cdk/core/lib/private/synthesis.js:128:5)",
+              "Object.synthesize (/tmp/jsii-kernel-BXgJin/node_modules/@aws-cdk/core/lib/private/synthesis.js:17:5)",
+              "App.synth (/tmp/jsii-kernel-BXgJin/node_modules/@aws-cdk/core/lib/stage.js:100:41)",
+              "/tmp/tmpseke2il_/lib/program.js:8183:134",
+              "Kernel._wrapSandboxCode (/tmp/tmpseke2il_/lib/program.js:8795:24)",
+              "/tmp/tmpseke2il_/lib/program.js:8183:107",
+              "Kernel._ensureSync (/tmp/tmpseke2il_/lib/program.js:8776:28)",
+              "Kernel.invoke (/tmp/tmpseke2il_/lib/program.js:8183:34)",
+              "KernelHost.processRequest (/tmp/tmpseke2il_/lib/program.js:9692:36)",
+              "KernelHost.run (/tmp/tmpseke2il_/lib/program.js:9655:22)",
+              "Immediate._onImmediate (/tmp/tmpseke2il_/lib/program.js:9656:46)",
+              "processImmediate (internal/timers.js:464:21)"
+            ]
+          }
+        ],
+        "/ProServeApgCentralisedVpcEndpointsHubStack/CDKMetadata/Condition": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "CDKMetadataAvailable",
+            "trace": [
+              "new MetadataResource (/tmp/jsii-kernel-BXgJin/node_modules/@aws-cdk/core/lib/private/metadata-resource.js:30:35)",
+              "/tmp/jsii-kernel-BXgJin/node_modules/@aws-cdk/core/lib/private/synthesis.js:139:9",
+              "visit (/tmp/jsii-kernel-BXgJin/node_modules/@aws-cdk/core/lib/private/synthesis.js:200:9)",
+              "visit (/tmp/jsii-kernel-BXgJin/node_modules/@aws-cdk/core/lib/private/synthesis.js:197:9)",
+              "injectMetadataResources (/tmp/jsii-kernel-BXgJin/node_modules/@aws-cdk/core/lib/private/synthesis.js:128:5)",
+              "Object.synthesize (/tmp/jsii-kernel-BXgJin/node_modules/@aws-cdk/core/lib/private/synthesis.js:17:5)",
+              "App.synth (/tmp/jsii-kernel-BXgJin/node_modules/@aws-cdk/core/lib/stage.js:100:41)",
+              "/tmp/tmpseke2il_/lib/program.js:8183:134",
+              "Kernel._wrapSandboxCode (/tmp/tmpseke2il_/lib/program.js:8795:24)",
+              "/tmp/tmpseke2il_/lib/program.js:8183:107",
+              "Kernel._ensureSync (/tmp/tmpseke2il_/lib/program.js:8776:28)",
+              "Kernel.invoke (/tmp/tmpseke2il_/lib/program.js:8183:34)",
+              "KernelHost.processRequest (/tmp/tmpseke2il_/lib/program.js:9692:36)",
+              "KernelHost.run (/tmp/tmpseke2il_/lib/program.js:9655:22)",
+              "Immediate._onImmediate (/tmp/tmpseke2il_/lib/program.js:9656:46)",
+              "processImmediate (internal/timers.js:464:21)"
+            ]
+          }
+        ]
+      },
+      "displayName": "ProServeApgCentralisedVpcEndpointsHubStack"
+    },
+    "ProServeApgCentralisedVpcEndpointsSpokeStack": {
+      "type": "aws:cloudformation:stack",
+      "environment": "aws://unknown-account/unknown-region",
+      "properties": {
+        "templateFile": "ProServeApgCentralisedVpcEndpointsSpokeStack.template.json",
+        "validateOnSynth": false
+      },
+      "metadata": {
+        "/ProServeApgCentralisedVpcEndpointsSpokeStack/VPCId": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "VPCId",
+            "trace": [
+              "/tmp/tmpseke2il_/lib/program.js:8367:58",
+              "Kernel._wrapSandboxCode (/tmp/tmpseke2il_/lib/program.js:8795:24)",
+              "Kernel._create (/tmp/tmpseke2il_/lib/program.js:8367:34)",
+              "Kernel.create (/tmp/tmpseke2il_/lib/program.js:8108:29)",
+              "KernelHost.processRequest (/tmp/tmpseke2il_/lib/program.js:9692:36)",
+              "KernelHost.run (/tmp/tmpseke2il_/lib/program.js:9655:22)",
+              "Immediate._onImmediate (/tmp/tmpseke2il_/lib/program.js:9656:46)",
+              "processImmediate (internal/timers.js:464:21)"
+            ]
+          }
+        ],
+        "/ProServeApgCentralisedVpcEndpointsSpokeStack/EndpointVPC": [
+          {
+            "type": "aws:cdk:warning",
+            "data": "fromVpcAttributes: 'availabilityZones' is a list token: the imported VPC will not work with constructs that require a list of subnets at synthesis time. Use 'Vpc.fromLookup()' or 'Fn.importListValue' instead.",
+            "trace": [
+              "Annotations.addMessage (/tmp/jsii-kernel-BXgJin/node_modules/@aws-cdk/core/lib/annotations.js:94:42)",
+              "Annotations.addWarning (/tmp/jsii-kernel-BXgJin/node_modules/@aws-cdk/core/lib/annotations.js:37:14)",
+              "new ImportedVpc (/tmp/jsii-kernel-BXgJin/node_modules/@aws-cdk/aws-ec2/lib/vpc.js:940:45)",
+              "Function.fromVpcAttributes (/tmp/jsii-kernel-BXgJin/node_modules/@aws-cdk/aws-ec2/lib/vpc.js:474:16)",
+              "/tmp/tmpseke2il_/lib/program.js:8204:114",
+              "Kernel._wrapSandboxCode (/tmp/tmpseke2il_/lib/program.js:8795:24)",
+              "/tmp/tmpseke2il_/lib/program.js:8204:87",
+              "Kernel._ensureSync (/tmp/tmpseke2il_/lib/program.js:8776:28)",
+              "Kernel.sinvoke (/tmp/tmpseke2il_/lib/program.js:8204:34)",
+              "KernelHost.processRequest (/tmp/tmpseke2il_/lib/program.js:9692:36)",
+              "KernelHost.run (/tmp/tmpseke2il_/lib/program.js:9655:22)",
+              "Immediate._onImmediate (/tmp/tmpseke2il_/lib/program.js:9656:46)",
+              "processImmediate (internal/timers.js:464:21)"
+            ]
+          }
+        ],
+        "/ProServeApgCentralisedVpcEndpointsSpokeStack/Route53RecordOuputForSSM": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "Route53RecordOuputForSSM",
+            "trace": [
+              "/tmp/tmpseke2il_/lib/program.js:8367:58",
+              "Kernel._wrapSandboxCode (/tmp/tmpseke2il_/lib/program.js:8795:24)",
+              "Kernel._create (/tmp/tmpseke2il_/lib/program.js:8367:34)",
+              "Kernel.create (/tmp/tmpseke2il_/lib/program.js:8108:29)",
+              "KernelHost.processRequest (/tmp/tmpseke2il_/lib/program.js:9692:36)",
+              "KernelHost.run (/tmp/tmpseke2il_/lib/program.js:9655:22)",
+              "Immediate._onImmediate (/tmp/tmpseke2il_/lib/program.js:9656:46)",
+              "processImmediate (internal/timers.js:464:21)"
+            ]
+          }
+        ],
+        "/ProServeApgCentralisedVpcEndpointsSpokeStack/PrivateZoneForssm/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "PrivateZoneForssm719B123A",
+            "trace": [
+              "new HostedZone (/tmp/jsii-kernel-BXgJin/node_modules/@aws-cdk/aws-route53/lib/hosted-zone.js:30:26)",
+              "/tmp/tmpseke2il_/lib/program.js:8367:58",
+              "Kernel._wrapSandboxCode (/tmp/tmpseke2il_/lib/program.js:8795:24)",
+              "Kernel._create (/tmp/tmpseke2il_/lib/program.js:8367:34)",
+              "Kernel.create (/tmp/tmpseke2il_/lib/program.js:8108:29)",
+              "KernelHost.processRequest (/tmp/tmpseke2il_/lib/program.js:9692:36)",
+              "KernelHost.run (/tmp/tmpseke2il_/lib/program.js:9655:22)",
+              "Immediate._onImmediate (/tmp/tmpseke2il_/lib/program.js:9656:46)",
+              "processImmediate (internal/timers.js:464:21)"
+            ]
+          }
+        ],
+        "/ProServeApgCentralisedVpcEndpointsSpokeStack/AliasRecordForssm/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "AliasRecordForssmEB151BC5",
+            "trace": [
+              "new RecordSet (/tmp/jsii-kernel-BXgJin/node_modules/@aws-cdk/aws-route53/lib/record-set.js:91:27)",
+              "/tmp/tmpseke2il_/lib/program.js:8367:58",
+              "Kernel._wrapSandboxCode (/tmp/tmpseke2il_/lib/program.js:8795:24)",
+              "Kernel._create (/tmp/tmpseke2il_/lib/program.js:8367:34)",
+              "Kernel.create (/tmp/tmpseke2il_/lib/program.js:8108:29)",
+              "KernelHost.processRequest (/tmp/tmpseke2il_/lib/program.js:9692:36)",
+              "KernelHost.run (/tmp/tmpseke2il_/lib/program.js:9655:22)",
+              "Immediate._onImmediate (/tmp/tmpseke2il_/lib/program.js:9656:46)",
+              "processImmediate (internal/timers.js:464:21)"
+            ]
+          }
+        ],
+        "/ProServeApgCentralisedVpcEndpointsSpokeStack/CDKMetadata/Default": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "CDKMetadata",
+            "trace": [
+              "new MetadataResource (/tmp/jsii-kernel-BXgJin/node_modules/@aws-cdk/core/lib/private/metadata-resource.js:22:30)",
+              "/tmp/jsii-kernel-BXgJin/node_modules/@aws-cdk/core/lib/private/synthesis.js:139:9",
+              "visit (/tmp/jsii-kernel-BXgJin/node_modules/@aws-cdk/core/lib/private/synthesis.js:200:9)",
+              "visit (/tmp/jsii-kernel-BXgJin/node_modules/@aws-cdk/core/lib/private/synthesis.js:197:9)",
+              "injectMetadataResources (/tmp/jsii-kernel-BXgJin/node_modules/@aws-cdk/core/lib/private/synthesis.js:128:5)",
+              "Object.synthesize (/tmp/jsii-kernel-BXgJin/node_modules/@aws-cdk/core/lib/private/synthesis.js:17:5)",
+              "App.synth (/tmp/jsii-kernel-BXgJin/node_modules/@aws-cdk/core/lib/stage.js:100:41)",
+              "/tmp/tmpseke2il_/lib/program.js:8183:134",
+              "Kernel._wrapSandboxCode (/tmp/tmpseke2il_/lib/program.js:8795:24)",
+              "/tmp/tmpseke2il_/lib/program.js:8183:107",
+              "Kernel._ensureSync (/tmp/tmpseke2il_/lib/program.js:8776:28)",
+              "Kernel.invoke (/tmp/tmpseke2il_/lib/program.js:8183:34)",
+              "KernelHost.processRequest (/tmp/tmpseke2il_/lib/program.js:9692:36)",
+              "KernelHost.run (/tmp/tmpseke2il_/lib/program.js:9655:22)",
+              "Immediate._onImmediate (/tmp/tmpseke2il_/lib/program.js:9656:46)",
+              "processImmediate (internal/timers.js:464:21)"
+            ]
+          }
+        ],
+        "/ProServeApgCentralisedVpcEndpointsSpokeStack/CDKMetadata/Condition": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "CDKMetadataAvailable",
+            "trace": [
+              "new MetadataResource (/tmp/jsii-kernel-BXgJin/node_modules/@aws-cdk/core/lib/private/metadata-resource.js:30:35)",
+              "/tmp/jsii-kernel-BXgJin/node_modules/@aws-cdk/core/lib/private/synthesis.js:139:9",
+              "visit (/tmp/jsii-kernel-BXgJin/node_modules/@aws-cdk/core/lib/private/synthesis.js:200:9)",
+              "visit (/tmp/jsii-kernel-BXgJin/node_modules/@aws-cdk/core/lib/private/synthesis.js:197:9)",
+              "injectMetadataResources (/tmp/jsii-kernel-BXgJin/node_modules/@aws-cdk/core/lib/private/synthesis.js:128:5)",
+              "Object.synthesize (/tmp/jsii-kernel-BXgJin/node_modules/@aws-cdk/core/lib/private/synthesis.js:17:5)",
+              "App.synth (/tmp/jsii-kernel-BXgJin/node_modules/@aws-cdk/core/lib/stage.js:100:41)",
+              "/tmp/tmpseke2il_/lib/program.js:8183:134",
+              "Kernel._wrapSandboxCode (/tmp/tmpseke2il_/lib/program.js:8795:24)",
+              "/tmp/tmpseke2il_/lib/program.js:8183:107",
+              "Kernel._ensureSync (/tmp/tmpseke2il_/lib/program.js:8776:28)",
+              "Kernel.invoke (/tmp/tmpseke2il_/lib/program.js:8183:34)",
+              "KernelHost.processRequest (/tmp/tmpseke2il_/lib/program.js:9692:36)",
+              "KernelHost.run (/tmp/tmpseke2il_/lib/program.js:9655:22)",
+              "Immediate._onImmediate (/tmp/tmpseke2il_/lib/program.js:9656:46)",
+              "processImmediate (internal/timers.js:464:21)"
+            ]
+          }
+        ]
+      },
+      "displayName": "ProServeApgCentralisedVpcEndpointsSpokeStack"
+    }
+  }
+}

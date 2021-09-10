@@ -1,0 +1,366 @@
+{
+  "version": "tree-0.1",
+  "tree": {
+    "id": "App",
+    "path": "",
+    "children": {
+      "Tree": {
+        "id": "Tree",
+        "path": "Tree",
+        "constructInfo": {
+          "fqn": "@aws-cdk/core.Construct",
+          "version": "1.122.0"
+        }
+      },
+      "ProServeApgCentralisedVpcEndpointsHubStack": {
+        "id": "ProServeApgCentralisedVpcEndpointsHubStack",
+        "path": "ProServeApgCentralisedVpcEndpointsHubStack",
+        "children": {
+          "VPCId": {
+            "id": "VPCId",
+            "path": "ProServeApgCentralisedVpcEndpointsHubStack/VPCId",
+            "constructInfo": {
+              "fqn": "@aws-cdk/core.CfnParameter",
+              "version": "1.122.0"
+            }
+          },
+          "OrgCIDR": {
+            "id": "OrgCIDR",
+            "path": "ProServeApgCentralisedVpcEndpointsHubStack/OrgCIDR",
+            "constructInfo": {
+              "fqn": "@aws-cdk/core.CfnParameter",
+              "version": "1.122.0"
+            }
+          },
+          "EndpointSubnetIdList": {
+            "id": "EndpointSubnetIdList",
+            "path": "ProServeApgCentralisedVpcEndpointsHubStack/EndpointSubnetIdList",
+            "constructInfo": {
+              "fqn": "@aws-cdk/core.CfnParameter",
+              "version": "1.122.0"
+            }
+          },
+          "EndpointVPC": {
+            "id": "EndpointVPC",
+            "path": "ProServeApgCentralisedVpcEndpointsHubStack/EndpointVPC",
+            "constructInfo": {
+              "fqn": "@aws-cdk/core.Resource",
+              "version": "1.122.0"
+            }
+          },
+          "SecurityGroupForEndpoints": {
+            "id": "SecurityGroupForEndpoints",
+            "path": "ProServeApgCentralisedVpcEndpointsHubStack/SecurityGroupForEndpoints",
+            "children": {
+              "Resource": {
+                "id": "Resource",
+                "path": "ProServeApgCentralisedVpcEndpointsHubStack/SecurityGroupForEndpoints/Resource",
+                "attributes": {
+                  "aws:cdk:cloudformation:type": "AWS::EC2::SecurityGroup",
+                  "aws:cdk:cloudformation:props": {
+                    "groupDescription": "ProServeApgCentralisedVpcEndpointsHubStack/SecurityGroupForEndpoints",
+                    "securityGroupEgress": [
+                      {
+                        "cidrIp": "0.0.0.0/0",
+                        "description": "Allow all outbound traffic by default",
+                        "ipProtocol": "-1"
+                      }
+                    ],
+                    "securityGroupIngress": [
+                      {
+                        "cidrIp": {
+                          "Ref": "OrgCIDR"
+                        },
+                        "ipProtocol": "tcp",
+                        "fromPort": 443,
+                        "toPort": 443,
+                        "description": {
+                          "Fn::Join": [
+                            "",
+                            [
+                              "from ",
+                              {
+                                "Ref": "OrgCIDR"
+                              },
+                              ":TTA"
+                            ]
+                          ]
+                        }
+                      }
+                    ],
+                    "vpcId": {
+                      "Ref": "VPCId"
+                    }
+                  }
+                },
+                "constructInfo": {
+                  "fqn": "@aws-cdk/aws-ec2.CfnSecurityGroup",
+                  "version": "1.122.0"
+                }
+              }
+            },
+            "constructInfo": {
+              "fqn": "@aws-cdk/aws-ec2.SecurityGroup",
+              "version": "1.122.0"
+            }
+          },
+          "EndpointForssm": {
+            "id": "EndpointForssm",
+            "path": "ProServeApgCentralisedVpcEndpointsHubStack/EndpointForssm",
+            "attributes": {
+              "aws:cdk:cloudformation:type": "AWS::EC2::VPCEndpoint",
+              "aws:cdk:cloudformation:props": {
+                "serviceName": {
+                  "Fn::Join": [
+                    "",
+                    [
+                      "com.amazonaws.",
+                      {
+                        "Ref": "AWS::Region"
+                      },
+                      ".ssm"
+                    ]
+                  ]
+                },
+                "vpcId": {
+                  "Ref": "VPCId"
+                },
+                "privateDnsEnabled": true,
+                "securityGroupIds": [
+                  {
+                    "Fn::GetAtt": [
+                      "SecurityGroupForEndpointsF9C56E0E",
+                      "GroupId"
+                    ]
+                  }
+                ],
+                "subnetIds": {
+                  "Ref": "EndpointSubnetIdList"
+                },
+                "vpcEndpointType": "Interface"
+              }
+            },
+            "constructInfo": {
+              "fqn": "@aws-cdk/aws-ec2.CfnVPCEndpoint",
+              "version": "1.122.0"
+            }
+          },
+          "Route53Domainforssm": {
+            "id": "Route53Domainforssm",
+            "path": "ProServeApgCentralisedVpcEndpointsHubStack/Route53Domainforssm",
+            "constructInfo": {
+              "fqn": "@aws-cdk/core.CfnOutput",
+              "version": "1.122.0"
+            }
+          },
+          "CDKMetadata": {
+            "id": "CDKMetadata",
+            "path": "ProServeApgCentralisedVpcEndpointsHubStack/CDKMetadata",
+            "children": {
+              "Default": {
+                "id": "Default",
+                "path": "ProServeApgCentralisedVpcEndpointsHubStack/CDKMetadata/Default",
+                "constructInfo": {
+                  "fqn": "@aws-cdk/core.CfnResource",
+                  "version": "1.122.0"
+                }
+              },
+              "Condition": {
+                "id": "Condition",
+                "path": "ProServeApgCentralisedVpcEndpointsHubStack/CDKMetadata/Condition",
+                "constructInfo": {
+                  "fqn": "@aws-cdk/core.CfnCondition",
+                  "version": "1.122.0"
+                }
+              }
+            },
+            "constructInfo": {
+              "fqn": "@aws-cdk/core.Construct",
+              "version": "1.122.0"
+            }
+          }
+        },
+        "constructInfo": {
+          "fqn": "@aws-cdk/core.Stack",
+          "version": "1.122.0"
+        }
+      },
+      "ProServeApgCentralisedVpcEndpointsSpokeStack": {
+        "id": "ProServeApgCentralisedVpcEndpointsSpokeStack",
+        "path": "ProServeApgCentralisedVpcEndpointsSpokeStack",
+        "children": {
+          "VPCId": {
+            "id": "VPCId",
+            "path": "ProServeApgCentralisedVpcEndpointsSpokeStack/VPCId",
+            "constructInfo": {
+              "fqn": "@aws-cdk/core.CfnParameter",
+              "version": "1.122.0"
+            }
+          },
+          "EndpointVPC": {
+            "id": "EndpointVPC",
+            "path": "ProServeApgCentralisedVpcEndpointsSpokeStack/EndpointVPC",
+            "constructInfo": {
+              "fqn": "@aws-cdk/core.Resource",
+              "version": "1.122.0"
+            }
+          },
+          "Route53RecordOuputForSSM": {
+            "id": "Route53RecordOuputForSSM",
+            "path": "ProServeApgCentralisedVpcEndpointsSpokeStack/Route53RecordOuputForSSM",
+            "constructInfo": {
+              "fqn": "@aws-cdk/core.CfnParameter",
+              "version": "1.122.0"
+            }
+          },
+          "PrivateZoneForssm": {
+            "id": "PrivateZoneForssm",
+            "path": "ProServeApgCentralisedVpcEndpointsSpokeStack/PrivateZoneForssm",
+            "children": {
+              "Resource": {
+                "id": "Resource",
+                "path": "ProServeApgCentralisedVpcEndpointsSpokeStack/PrivateZoneForssm/Resource",
+                "attributes": {
+                  "aws:cdk:cloudformation:type": "AWS::Route53::HostedZone",
+                  "aws:cdk:cloudformation:props": {
+                    "name": {
+                      "Fn::Join": [
+                        "",
+                        [
+                          "ssm.",
+                          {
+                            "Ref": "AWS::Region"
+                          },
+                          ".amazonaws.com."
+                        ]
+                      ]
+                    },
+                    "vpcs": [
+                      {
+                        "vpcId": {
+                          "Ref": "VPCId"
+                        },
+                        "vpcRegion": {
+                          "Ref": "AWS::Region"
+                        }
+                      }
+                    ]
+                  }
+                },
+                "constructInfo": {
+                  "fqn": "@aws-cdk/aws-route53.CfnHostedZone",
+                  "version": "1.122.0"
+                }
+              }
+            },
+            "constructInfo": {
+              "fqn": "@aws-cdk/aws-route53.HostedZone",
+              "version": "1.122.0"
+            }
+          },
+          "AliasRecordForssm": {
+            "id": "AliasRecordForssm",
+            "path": "ProServeApgCentralisedVpcEndpointsSpokeStack/AliasRecordForssm",
+            "children": {
+              "Resource": {
+                "id": "Resource",
+                "path": "ProServeApgCentralisedVpcEndpointsSpokeStack/AliasRecordForssm/Resource",
+                "attributes": {
+                  "aws:cdk:cloudformation:type": "AWS::Route53::RecordSet",
+                  "aws:cdk:cloudformation:props": {
+                    "name": {
+                      "Fn::Join": [
+                        "",
+                        [
+                          "ssm.",
+                          {
+                            "Ref": "AWS::Region"
+                          },
+                          ".amazonaws.com."
+                        ]
+                      ]
+                    },
+                    "type": "A",
+                    "aliasTarget": {
+                      "dnsName": {
+                        "Fn::Select": [
+                          1,
+                          {
+                            "Fn::Split": [
+                              ":",
+                              {
+                                "Ref": "Route53RecordOuputForSSM"
+                              }
+                            ]
+                          }
+                        ]
+                      },
+                      "hostedZoneId": {
+                        "Fn::Select": [
+                          0,
+                          {
+                            "Fn::Split": [
+                              ":",
+                              {
+                                "Ref": "Route53RecordOuputForSSM"
+                              }
+                            ]
+                          }
+                        ]
+                      }
+                    },
+                    "hostedZoneId": {
+                      "Ref": "PrivateZoneForssm719B123A"
+                    }
+                  }
+                },
+                "constructInfo": {
+                  "fqn": "@aws-cdk/aws-route53.CfnRecordSet",
+                  "version": "1.122.0"
+                }
+              }
+            },
+            "constructInfo": {
+              "fqn": "@aws-cdk/aws-route53.RecordSet",
+              "version": "1.122.0"
+            }
+          },
+          "CDKMetadata": {
+            "id": "CDKMetadata",
+            "path": "ProServeApgCentralisedVpcEndpointsSpokeStack/CDKMetadata",
+            "children": {
+              "Default": {
+                "id": "Default",
+                "path": "ProServeApgCentralisedVpcEndpointsSpokeStack/CDKMetadata/Default",
+                "constructInfo": {
+                  "fqn": "@aws-cdk/core.CfnResource",
+                  "version": "1.122.0"
+                }
+              },
+              "Condition": {
+                "id": "Condition",
+                "path": "ProServeApgCentralisedVpcEndpointsSpokeStack/CDKMetadata/Condition",
+                "constructInfo": {
+                  "fqn": "@aws-cdk/core.CfnCondition",
+                  "version": "1.122.0"
+                }
+              }
+            },
+            "constructInfo": {
+              "fqn": "@aws-cdk/core.Construct",
+              "version": "1.122.0"
+            }
+          }
+        },
+        "constructInfo": {
+          "fqn": "@aws-cdk/core.Stack",
+          "version": "1.122.0"
+        }
+      }
+    },
+    "constructInfo": {
+      "fqn": "@aws-cdk/core.App",
+      "version": "1.122.0"
+    }
+  }
+}
