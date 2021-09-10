@@ -1,0 +1,5 @@
+-e .
+aws-cdk.aws_iam
+aws-cdk.aws-ec2
+aws-cdk.aws-route53
+aws-cdk.aws-route53-targets
