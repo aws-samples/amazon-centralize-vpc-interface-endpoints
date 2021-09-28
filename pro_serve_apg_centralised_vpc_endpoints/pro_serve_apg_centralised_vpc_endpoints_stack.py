@@ -35,20 +35,50 @@ class ProServeApgCentralisedVpcEndpointsHubStack(cdk.Stack):
             connection=ec2.Port(protocol=ec2.Protocol.TCP, from_port=443, to_port=443, string_representation="TTA"),
         )
 
-        for endpoint_name in services:
+        for service in services:
+            record_name = f"{service}.{core.Aws.REGION}.amazonaws.com"
 
             endpoint = ec2.CfnVPCEndpoint(
                 self,
-                f"EndpointFor{endpoint_name}",
+                f"EndpointFor{service}",
                 vpc_id=vpc_id,
                 security_group_ids=[security_group_for_endpoints.security_group_id],
                 vpc_endpoint_type="Interface",
-                private_dns_enabled=True,
-                service_name=f"com.amazonaws.{core.Aws.REGION}.{endpoint_name}",
+                private_dns_enabled=False,
+                service_name=f"com.amazonaws.{core.Aws.REGION}.{service}",
                 subnet_ids=subnet_ids,
             )
+            
+            hosted_zone = route53.PrivateHostedZone(
+                self, 
+                f"PrivateZoneFor{service}",
+                zone_name=record_name,
+                vpc=vpc
+            )
+            route53.RecordSet(
+                self,
+                f"AliasRecordFor{service}",
+                record_type=route53.RecordType.A,
+                zone=hosted_zone,
+                record_name=record_name,
+                target=route53.RecordTarget(alias_target=RemoteInterfaceEndpointTarget(core.Fn.select(0, endpoint.attr_dns_entries))),
+            )
 
-            core.CfnOutput(self, f"Route53Domainfor{endpoint_name}", value=core.Fn.select(0, endpoint.attr_dns_entries))
+            core.CfnOutput(self, f"Route53Domainfor{service}", value=core.Fn.select(0, endpoint.attr_dns_entries))
+
+@jsii.implements(route53.IAliasRecordTarget)
+class RemoteInterfaceEndpointTarget:
+    def __init__(self, remote_endpoint_config):
+        """ :param: remote_endpoint_config is a key value pair in the form of <hosted zone id>:<vpc endpoint dns name of the record>
+    """
+        self.remote_endpoint_config = remote_endpoint_config
+
+    def bind(self, _, _a):
+
+        return route53.AliasRecordTargetConfig(
+            dns_name=cdk.Fn.select(1, cdk.Fn.split(":", self.remote_endpoint_config)),
+            hosted_zone_id=cdk.Fn.select(0, cdk.Fn.split(":", self.remote_endpoint_config)),
+        )
 
 
 class ProServeApgCentralisedVpcEndpointsSpokeStack(cdk.Stack):
