@@ -35,6 +35,13 @@ class ProServeApgCentralisedVpcEndpointsHubStack(cdk.Stack):
             connection=ec2.Port(protocol=ec2.Protocol.TCP, from_port=443, to_port=443, string_representation="TTA"),
         )
 
+        Hub_Lambda = _lambda.Function(
+            self, 'HelloHandler',
+            runtime=_lambda.Runtime.PYTHON_3_7,
+            code=_lambda.Code.from_asset('lambda'),
+            handler='hello.handler',
+        )
+
         for service in services:
             record_name = f"{service}.{core.Aws.REGION}.amazonaws.com"
 
