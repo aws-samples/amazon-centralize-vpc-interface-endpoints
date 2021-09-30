@@ -94,6 +94,12 @@ class ProServeApgCentralisedVpcEndpointsSpokeStack(cdk.Stack):
         super().__init__(scope, construct_id, **kwargs)
 
         vpc_id = core.CfnParameter(self, "VPCId",description="The VPC that you want to use the centralised endpoints in.", type="AWS::EC2::VPC::Id").value_as_string
+        AssumeRoleARN = core.CfnParameter(
+            self,
+            f"AssumeRoleARN",
+            description=f"The Route53 Role in the Hub Account that allows us to Authorize a VPC to the Private Hosted Zone",
+#            allowed_pattern="/^arn:aws:iam::([0-9]+):.+)$"
+        ).value_as_string
 
         vpc = ec2.Vpc.from_vpc_attributes(
             self, "EndpointVPC", vpc_id=vpc_id, availability_zones=core.Fn.get_azs(core.Aws.REGION)
@@ -115,21 +121,21 @@ class ProServeApgCentralisedVpcEndpointsSpokeStack(cdk.Stack):
 
         for service in services:
 
-            service_target_record = core.CfnParameter(
+            service_HostedZoneID = core.CfnParameter(
                 self,
-                f"Route53RecordOuputFor{service.upper()}",
-                description=f"The output from the hub stack for the the {service.upper()} service, in the for of <route53 hosted zone id>:<regional vpc endpoint dns name>",
-                allowed_pattern="^[A-Z0-9]+:.+$"
+                f"Route53HostedZoneID-{service.upper()}",
+                description=f"The route53 hosted zone id from the hub stack for the the {service.upper()} service, the string before the colon in <route53 hosted zone id>:<regional vpc endpoint dns name>",
+                allowed_pattern="^[A-Z0-9]+$"
             ).value_as_string
 
             record_name = f"{service}.{core.Aws.REGION}.amazonaws.com"
-            vpc_association_authorization = AwsCustomResource(self, "VpcAssociationAuthorization",
+            vpc_association_authorization = AwsCustomResource(self, f"VpcAssociationAuthorization-{service}",
                 on_create={
                     "assumed_role_arn": "arn:aws:iam::610408810780:role/ProServeApgCentralisedVpcEndpoints-R53Role778AB903-DK5I6NEW48MZ",
                     "service": "Route53",
                     "action": "createVPCAssociationAuthorization",
                     "parameters": {
-                        "HostedZoneId": "Z044055532752CKAOB9Z7",
+                        "HostedZoneId": service_HostedZoneID,
                         "VPC": {
                             "VPCId": vpc_id,
                             "VPCRegion": core.Aws.REGION
@@ -141,13 +147,12 @@ class ProServeApgCentralisedVpcEndpointsSpokeStack(cdk.Stack):
                 policy=AwsCustomResourcePolicy.from_sdk_calls(resources=AwsCustomResourcePolicy.ANY_RESOURCE)
             )
 
-            vpc_AssociateVPCWithHostedZone = AwsCustomResource(self, "AssociateVPCWithHostedZone",
+            vpc_AssociateVPCWithHostedZone = AwsCustomResource(self, f"AssociateVPCWithHostedZone-{service}",
                 on_create={
-
                     "service": "Route53",
                     "action": "associateVPCWithHostedZone",
                     "parameters": {
-                        "HostedZoneId": "Z044055532752CKAOB9Z7",
+                        "HostedZoneId": service_HostedZoneID,
                         "VPC": {
                             "VPCId": vpc_id,
                             "VPCRegion": core.Aws.REGION
@@ -155,13 +160,31 @@ class ProServeApgCentralisedVpcEndpointsSpokeStack(cdk.Stack):
                     },
                     "physical_resource_id": PhysicalResourceId.of(f"associateVPCWithHostedZone-{service}") #Used as Role SessionName so must be less that <64 chars
                 },
-                policy=AwsCustomResourcePolicy.from_sdk_calls(resources=AwsCustomResourcePolicy.statements[
-                    effect=iam.Effect.ALLOW,
-                    resources=["*"],
-                    actions=["route53:AssociateVPCWithHostedZone","route53:DisassociateVPCFromHostedZone","ec2:DescribeVpcs"]
-                ]),
+                role=R53_Spoke_role,
+                policy = AwsCustomResourcePolicy.from_statements(statements=[iam.PolicyStatement(actions=["route53:AssociateVPCWithHostedZone","ec2:*"], resources=["*"])])
             )
             vpc_AssociateVPCWithHostedZone.node.add_dependency(vpc_association_authorization)
+
+            # # Best Practise is to remove the Authorisation afterwards
+            # vpc_association_authorization = AwsCustomResource(self, f"deleteVPCAssociationAuthorization-{service}",
+            #     on_create={
+            #         "assumed_role_arn": "arn:aws:iam::610408810780:role/ProServeApgCentralisedVpcEndpoints-R53Role778AB903-DK5I6NEW48MZ",
+            #         "service": "Route53",
+            #         "action": "deleteVPCAssociationAuthorization",
+            #         "parameters": {
+            #             "HostedZoneId": service_HostedZoneID,
+            #             "VPC": {
+            #                 "VPCId": vpc_id,
+            #                 "VPCRegion": core.Aws.REGION
+            #             }
+            #         },
+            #         "physical_resource_id": PhysicalResourceId.of(f"deleteVPCAssociationAuthorization-{service}") #Used as Role SessionName so must be less that <64 chars
+            #     },                           
+            #     # Will ignore any resource and use the assumedRoleArn as resource and 'sts:AssumeRole' for service:action
+            #     policy=AwsCustomResourcePolicy.from_sdk_calls(resources=AwsCustomResourcePolicy.ANY_RESOURCE)
+            # )            
+            # vpc_AssociateVPCWithHostedZone.node.add_dependency(vpc_association_authorization)
+
 
 @jsii.implements(route53.IAliasRecordTarget)
 class RemoteInterfaceEndpointTarget:
