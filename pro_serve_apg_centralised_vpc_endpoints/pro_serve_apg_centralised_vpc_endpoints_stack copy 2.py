@@ -7,8 +7,7 @@ from aws_cdk import (
     aws_route53 as route53,
     aws_route53_targets as targets,
     aws_lambda as _lambda,
-    aws_iam as iam,
-    aws_logs as logs
+    aws_iam as iam
 )
 
 
@@ -16,9 +15,8 @@ from aws_cdk.custom_resources import (
     AwsCustomResource,
     AwsCustomResourcePolicy,
     PhysicalResourceId,
-    AwsSdkCall,
+    AwsSdkCall
 )
-import aws_cdk.custom_resources as custom_resources
 import jsii
 
 
@@ -30,10 +28,6 @@ class ProServeApgCentralisedVpcEndpointsHubStack(cdk.Stack):
 
         org_cidr = core.CfnParameter(
             self, "OrgCIDR", description="The CIDR range that requests can originate from to use this endpoint.", allowed_pattern="^[\d]{1,3}\.[\d]{1,3}\.[\d]{1,3}\.[\d]{1,3}\/[\d]{1,3}$", constraint_description="CIDR should be in form X.X.X.X/X",
-        ).value_as_string
-
-        org_id = core.CfnParameter(
-            self, "OrgID", description="The Organization ID which you'll allow to associate with your Hosted Zone",
         ).value_as_string
 
         subnet_ids = core.CfnParameter(
@@ -53,16 +47,15 @@ class ProServeApgCentralisedVpcEndpointsHubStack(cdk.Stack):
 
         # Create a Role that is assumed by the Spoke
         R53_role = iam.Role(self, "R53 Role",
-            assumed_by=iam.AnyPrincipal().with_conditions({"StringEquals": {"aws:PrincipalOrgID": org_id}})
+            assumed_by=iam.ServicePrincipal("lambda.amazonaws.com")
         )
 
         # Add permissions to the Role
         R53_role.add_to_policy(iam.PolicyStatement(
             effect=iam.Effect.ALLOW,
             resources=["*"],
-            actions=["route53:CreateVPCAssociationAuthorization","route53:DeleteVPCAssociationAuthorization"],
-            )
-        )
+            actions=["route53:CreateVPCAssociationAuthorization","route53:DeleteVPCAssociationAuthorization"]
+        ))
 
 
         for service in services:
@@ -94,8 +87,7 @@ class ProServeApgCentralisedVpcEndpointsHubStack(cdk.Stack):
                 target=route53.RecordTarget(alias_target=RemoteInterfaceEndpointTarget(core.Fn.select(0, endpoint.attr_dns_entries))),
             )
 
-            core.CfnOutput(self, f"Route53DomainIDFor{service.upper()}", value=hosted_zone.hosted_zone_id)
-        core.CfnOutput(self, f"R53HubRoleToAssume", value=R53_role.role_arn)
+            core.CfnOutput(self, f"Route53Domainfor{service}", value=core.Fn.select(0, endpoint.attr_dns_entries))
 
 
 class ProServeApgCentralisedVpcEndpointsSpokeStack(cdk.Stack):
@@ -105,7 +97,7 @@ class ProServeApgCentralisedVpcEndpointsSpokeStack(cdk.Stack):
         vpc_id = core.CfnParameter(self, "VPCId",description="The VPC that you want to use the centralised endpoints in.", type="AWS::EC2::VPC::Id").value_as_string
         AssumeRoleARN = core.CfnParameter(
             self,
-            f"R53HubRoleToAssume",
+            f"AssumeRoleARN",
             description=f"The Route53 Role in the Hub Account that allows us to Authorize a VPC to the Private Hosted Zone",
 #            allowed_pattern="/^arn:aws:iam::([0-9]+):.+)$"
         ).value_as_string
@@ -114,25 +106,26 @@ class ProServeApgCentralisedVpcEndpointsSpokeStack(cdk.Stack):
             self, "EndpointVPC", vpc_id=vpc_id, availability_zones=core.Fn.get_azs(core.Aws.REGION)
         )
 
-        #R53Lambda Role
-        AssociateVPC_Lambda_Role = iam.Role(self, "AssociateVPC_Lambda_Role",
+        # We forcefully create a role for the 
+        # Create a Role that is assumed by the Spoke
+        R53_Spoke_role = iam.Role(self, "R53 Role",
             assumed_by=iam.ServicePrincipal("lambda.amazonaws.com")
         )
-        AssociateVPC_Lambda_Role.add_managed_policy(iam.ManagedPolicy.from_aws_managed_policy_name("service-role/AWSLambdaBasicExecutionRole"))
-        AssociateVPC_Lambda_Role.add_managed_policy(iam.ManagedPolicy.from_aws_managed_policy_name("service-role/AWSLambdaVPCAccessExecutionRole"))
-            
-        # Add permissions to the Lambda Role for R53 and AssumeRole
-        AssociateVPC_Lambda_Role.add_to_policy(iam.PolicyStatement(
+
+        # Add permissions to the Role
+        R53_Spoke_role.add_to_policy(iam.PolicyStatement(
             effect=iam.Effect.ALLOW,
             resources=["*"],
-            actions=["ec2:DescribeVpcs","route53:AssociateVPCWithHostedZone","route53:DisassociateVPCFromHostedZone"]
+            actions=["*"]
         ))
+        R53_Spoke_role.add_managed_policy(iam.ManagedPolicy.from_aws_managed_policy_name("service-role/AWSLambdaBasicExecutionRole"))
+        R53_Spoke_role.add_managed_policy(iam.ManagedPolicy.from_aws_managed_policy_name("service-role/AWSLambdaVPCAccessExecutionRole"))
 
         for service in services:
 
             service_HostedZoneID = core.CfnParameter(
                 self,
-                f"Route53DomainIDFor{service.upper()}",
+                f"Route53HostedZoneID{service.upper()}",
                 description=f"The route53 hosted zone id from the hub stack for the the {service.upper()} service, the string before the colon in <route53 hosted zone id>:<regional vpc endpoint dns name>",
                 allowed_pattern="^[A-Z0-9]+$"
             ).value_as_string
@@ -144,7 +137,7 @@ class ProServeApgCentralisedVpcEndpointsSpokeStack(cdk.Stack):
                     "service": "Route53",
                     "action": "createVPCAssociationAuthorization",
                     "parameters": {
-                        "HostedZoneId": service_HostedZoneID,
+                        "HostedZoneId": "Z044055532752CKAOB9Z7",
                         "VPC": {
                             "VPCId": vpc_id,
                             "VPCRegion": core.Aws.REGION
@@ -153,31 +146,97 @@ class ProServeApgCentralisedVpcEndpointsSpokeStack(cdk.Stack):
                     "physical_resource_id": PhysicalResourceId.of(f"createVPCAssociationAuthorization-{service}") #Used as Role SessionName so must be less that <64 chars
                 },                           
                 # Will ignore any resource and use the assumedRoleArn as resource and 'sts:AssumeRole' for service:action
-                policy=AwsCustomResourcePolicy.from_sdk_calls(resources=AwsCustomResourcePolicy.ANY_RESOURCE)
+#                policy=AwsCustomResourcePolicy.from_sdk_calls(resources=AwsCustomResourcePolicy.ANY_RESOURCE)
+                role=R53_Spoke_role,
+                policy = AwsCustomResourcePolicy.from_statements(
+                    statements=[
+                        iam.PolicyStatement(
+                            actions=["route53:*","ec2:*","sts:AssumeRole"], 
+                            resources=["*"])
+                            ]
+                        )
             )
-            ### awscustomresource does not like two in a row as it gets confused with the Roles/Permissions - so will create my own Lambda
-            R53_Lambda = _lambda.Function(
-                self, f'R53AssociateFunctionFor{service.upper()}',
-                runtime=_lambda.Runtime.PYTHON_3_7,
-                code=_lambda.Code.from_asset('lambda'),
-                handler='R53Associate.handler',
-                role=AssociateVPC_Lambda_Role
-            )
-            my_provider = custom_resources.Provider(self, "MyProviderFor{service.upper()}",
-            on_event_handler=R53_Lambda,
-            log_retention=logs.RetentionDays.ONE_DAY, # default is INFINITE
-            )
+            ### awscustomresource does not like to in a row as it gets confused with the Roles/Permissions - so will create my own Lambda
+                    lambda_role = iam.Role(self, "Lambda Role",
+            assumed_by=iam.ServicePrincipal("lambda.amazonaws.com")
+        )
+        lambda_role.add_managed_policy(iam.ManagedPolicy.from_aws_managed_policy_name("service-role/AWSLambdaBasicExecutionRole"))
+        lambda_role.add_managed_policy(iam.ManagedPolicy.from_aws_managed_policy_name("service-role/AWSLambdaVPCAccessExecutionRole"))
+            
+        # Add permissions to the Lambda Role for R53 and AssumeRole
+        lambda_role.add_to_policy(iam.PolicyStatement(
+            effect=iam.Effect.ALLOW,
+            resources=["*"],
+            actions=["sts:AssumeRole","route53:AssociateVPCWithHostedZone","route53:DisassociateVPCFromHostedZone"]
+        ))
 
-            R53CustomResource = core.CustomResource(self, "R53AssociateCustomResourceFor{service.upper()}", 
-                service_token=my_provider.service_token, 
-                properties={
-                    "VPCID": vpc_id ,
-                    "HostedZoneID": service_HostedZoneID,
-                    "AccountID": core.Aws.ACCOUNT_ID
-                },
-            )
+        R53_Lambda = _lambda.Function(
+            self, 'R53Associate',
+            runtime=_lambda.Runtime.PYTHON_3_7,
+            code=_lambda.Code.from_asset('lambda'),
+            handler='R53Associate.handler',
+            role=lambda_role
+        )
+        my_provider = cr.Provider(self, "MyProvider",
+        on_event_handler=R53_Lambda,
+        log_retention=logs.RetentionDays.ONE_DAY, # default is INFINITE
+        )
 
-            R53CustomResource.node.add_dependency(vpc_association_authorization)
+        CustomResource(self, "Run my Lambda", 
+            service_token=my_provider.service_token, 
+            properties={
+                "VPCID": vpc_id ,
+                "HostedZoneID": service_HostedZoneID,
+                "Action": "ASSOCIATE",
+            },
+        )
+
+
+
+            # vpc_AssociateVPCWithHostedZone = AwsCustomResource(self, f"AssociateVPCWithHostedZone-{service}",
+            #     on_create={
+            #         "service": "Route53",
+            #         "action": "associateVPCWithHostedZone",
+            #         "parameters": {
+            #             "HostedZoneId": "Z044055532752CKAOB9Z7",
+            #             "VPC": {
+            #                 "VPCId": vpc_id,
+            #                 "VPCRegion": core.Aws.REGION
+            #             }
+            #         },
+            #         "physical_resource_id": PhysicalResourceId.of(f"associateVPCWithHostedZone-{service}") #Used as Role SessionName so must be less that <64 chars
+            #     },
+            #     role=R53_Spoke_role,
+            #     policy = AwsCustomResourcePolicy.from_statements(
+            #         statements=[
+            #             iam.PolicyStatement(
+            #                 actions=["route53:*","ec2:*"], 
+            #                 resources=["*"])
+            #                 ]
+            #             )
+            # )
+            # vpc_AssociateVPCWithHostedZone.node.add_dependency(vpc_association_authorization)
+            # vpc_AssociateVPCWithHostedZone.node.add_dependency(R53_Spoke_role)
+
+            # # Best Practise is to remove the Authorisation afterwards
+            # vpc_association_authorization = AwsCustomResource(self, f"deleteVPCAssociationAuthorization-{service}",
+            #     on_create={
+            #         "assumed_role_arn": "arn:aws:iam::610408810780:role/ProServeApgCentralisedVpcEndpoints-R53Role778AB903-DK5I6NEW48MZ",
+            #         "service": "Route53",
+            #         "action": "deleteVPCAssociationAuthorization",
+            #         "parameters": {
+            #             "HostedZoneId": service_HostedZoneID,
+            #             "VPC": {
+            #                 "VPCId": vpc_id,
+            #                 "VPCRegion": core.Aws.REGION
+            #             }
+            #         },
+            #         "physical_resource_id": PhysicalResourceId.of(f"deleteVPCAssociationAuthorization-{service}") #Used as Role SessionName so must be less that <64 chars
+            #     },                           
+            #     # Will ignore any resource and use the assumedRoleArn as resource and 'sts:AssumeRole' for service:action
+            #     policy=AwsCustomResourcePolicy.from_sdk_calls(resources=AwsCustomResourcePolicy.ANY_RESOURCE)
+            # )            
+            # vpc_AssociateVPCWithHostedZone.node.add_dependency(vpc_association_authorization)
 
 
 @jsii.implements(route53.IAliasRecordTarget)
