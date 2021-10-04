@@ -14,8 +14,8 @@ from pro_serve_apg_centralised_vpc_endpoints.pro_serve_apg_centralised_vpc_endpo
 
 app = core.App()
 
-services =  ["sqs"]
-# services =  ["ssm","ec2messages","ec2","ssmmessages","kms"]
+#services =  ["sqs"]
+services =  ["ssm","ec2messages","ec2","ssmmessages","kms"]
 
 hub_env = core.Environment()
 spoke_env = core.Environment()

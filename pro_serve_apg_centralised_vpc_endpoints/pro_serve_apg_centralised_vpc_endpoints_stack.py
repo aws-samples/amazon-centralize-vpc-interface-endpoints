@@ -130,7 +130,7 @@ class ProServeApgCentralisedVpcEndpointsSpokeStack(cdk.Stack):
 
         # The list of services are in the app.py file
         for service in services:
-            service_HostedZoneID = core.CfnParameter(
+            globals()[f"HostedZoneID_{service}"] = core.CfnParameter(
                 self,
                 f"Route53DomainIDFor{service.upper()}",
                 description=f"The route53 hosted zone id from the hub stack for the the {service.upper()} service, the string before the colon in <route53 hosted zone id>:<regional vpc endpoint dns name>",
@@ -138,13 +138,13 @@ class ProServeApgCentralisedVpcEndpointsSpokeStack(cdk.Stack):
             ).value_as_string
 
             record_name = f"{service}.{core.Aws.REGION}.amazonaws.com"
-            vpc_association_authorization = AwsCustomResource(self, f"VpcAssociationAuthorization-{service}",
+            globals()[f"vpc_association_authorization_{service}"] = AwsCustomResource(self, f"VpcAssociationAuthorization-{service}",
                 on_create={
                     "assumed_role_arn": AssumeRoleARN,
                     "service": "Route53",
                     "action": "createVPCAssociationAuthorization",
                     "parameters": {
-                        "HostedZoneId": service_HostedZoneID,
+                        "HostedZoneId": globals()[f"HostedZoneID_{service}"],
                         "VPC": {
                             "VPCId": vpc_id,
                             "VPCRegion": core.Aws.REGION
@@ -157,28 +157,28 @@ class ProServeApgCentralisedVpcEndpointsSpokeStack(cdk.Stack):
             )
             ### awscustomresource does not like two in a row as it gets confused with the Roles/Permissions - so will create my own Lambda
             ### (I could do both in the same Lambda but thought it would be nice to show examples of both methods)
-            R53_Lambda = _lambda.Function(
+            globals()[f"R53_Lambda_{service}"] = _lambda.Function(
                 self, f'R53AssociateFunctionFor{service.upper()}',
                 runtime=_lambda.Runtime.PYTHON_3_7,
                 code=_lambda.Code.from_asset('lambda'),
                 handler='R53Associate.handler',
                 role=AssociateVPC_Lambda_Role
             )
-            my_provider = custom_resources.Provider(self, "MyProviderFor{service.upper()}",
-            on_event_handler=R53_Lambda,
+            globals()[f"my_provider_{service}"] = custom_resources.Provider(self, f"MyProviderFor{service.upper()}",
+            on_event_handler=globals()[f"R53_Lambda_{service}"],
             log_retention=logs.RetentionDays.ONE_DAY, # default is INFINITE
             )
 
-            R53CustomResource = core.CustomResource(self, "R53AssociateCustomResourceFor{service.upper()}", 
-                service_token=my_provider.service_token, 
+            globals()[f"R53CustomResource_{service}"] = core.CustomResource(self, f"R53AssociateCustomResourceFor{service.upper()}", 
+                service_token=globals()[f"my_provider_{service}"].service_token, 
                 properties={
                     "VPCID": vpc_id ,
-                    "HostedZoneID": service_HostedZoneID,
+                    "HostedZoneID": globals()[f"HostedZoneID_{service}"],
                     "AccountID": core.Aws.ACCOUNT_ID
                 },
             )
             # Ensure that the Authorization Custom Resource is completed before the Association Lambda
-            R53CustomResource.node.add_dependency(vpc_association_authorization)
+            globals()[f"R53CustomResource_{service}"].node.add_dependency(globals()[f"vpc_association_authorization_{service}"])
 
 
 @jsii.implements(route53.IAliasRecordTarget)
