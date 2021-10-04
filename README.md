@@ -56,6 +56,7 @@ To add additional dependencies, for example other CDK libraries, just add
 them to your `setup.py` file and rerun the `pip install -r requirements.txt`
 command.
 
+## Deployment
 To install the Services **Hub** VPC Cloudformation Template, use the following command with these parameters (with the Hub Credentials):
 * VPCId = VPC to install the VPC Endpoints
 * OrgCIDR = CIDR range for the Security Group on the VPC Endpoint (which IPs in your Org are allowed to use the Endpoints)
