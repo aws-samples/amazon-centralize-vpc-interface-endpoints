@@ -64,15 +64,22 @@ To install the Services **Hub** VPC Cloudformation Template, use the following c
 * OrgID = Used to determine which accounts are allowed to Assume the Role and Authenticate VPCs to the Route53 Private Hosted Zone (PHZ)
 
 ```
-cdk deploy <Stack-Name> --parameters VPCId=vpc-xxxxxxxxx --parameters OrgCIDR=xx.xx.xx.xx/xx --parameters EndpointSubnetIdList="subnet-xxxxxxxxx, subnet-xxxxxxxxxx, subnet-xxxxxxx"  --parameters OrgID=o-xxxxxxxxxx
+cdk deploy <Stack-Name> --parameters VPCId=vpc-xxxxxxxxx \
+   --parameters OrgCIDR=xx.xx.xx.xx/xx \
+   --parameters EndpointSubnetIdList="subnet-xxxxxxxxx, subnet-xxxxxxxxxx, subnet-xxxxxxx"  \
+   --parameters OrgID=o-xxxxxxxxxx
 ```
 
 To install the Services **Spoke** VPC Cloudformation Template, use the following command with these parameters (with the Spoke Credentials):
 * VPCId = VPC to associate to the Hub's PHZ 
 * R53HubRoleToAssume = Route53 Hub Role to Assume for Authenticating the VPC against the PHZ, provided from the output of the Hub
 * Route53DomainIDFor<Service1> = Route53 PHZ Domain ID to Authenticate and Associate against, 1 per Servuce, provided from the output of the Hub
-
-cdk deploy <Stack-Name> --parameters VPCId=vpc-xxxxxxxxx -parameters R53HubRoleToAssume=arn:aws:iam::xxxxxxxxxxxx:role/xxxxxxxxxxxx --parameters Route53DomainIDFor<Service1>=xxxxxxxxxxxxxxxxxxxxx, Route53DomainIDFor<Service2>=xxxxxxxxxxxxxxxxxxxxx, etc.
+```
+cdk deploy <Stack-Name> --parameters VPCId=vpc-xxxxxxxxx \
+  --parameters R53HubRoleToAssume=arn:aws:iam::xxxxxxxxxxxx:role/xxxxxxxxxxxx \
+  --parameters Route53DomainIDFor<Service1>=xxxxxxxxxxxxxxxxxxxxx \
+  --parameters Route53DomainIDFor<Service2>=xxxxxxxxxxxxxxxxxxxxx, etc.
+```  
 ### Useful commands
 
  * `cdk ls`          list all stacks in the app
