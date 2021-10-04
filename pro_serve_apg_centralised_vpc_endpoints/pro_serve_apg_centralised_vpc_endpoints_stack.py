@@ -64,7 +64,7 @@ class ProServeApgCentralisedVpcEndpointsHubStack(cdk.Stack):
             )
         )
 
-
+        # The list of services are in the app.py file
         for service in services:
             record_name = f"{service}.{core.Aws.REGION}.amazonaws.com"
 
@@ -128,8 +128,8 @@ class ProServeApgCentralisedVpcEndpointsSpokeStack(cdk.Stack):
             actions=["ec2:DescribeVpcs","route53:AssociateVPCWithHostedZone","route53:DisassociateVPCFromHostedZone"]
         ))
 
+        # The list of services are in the app.py file
         for service in services:
-
             service_HostedZoneID = core.CfnParameter(
                 self,
                 f"Route53DomainIDFor{service.upper()}",
@@ -140,7 +140,7 @@ class ProServeApgCentralisedVpcEndpointsSpokeStack(cdk.Stack):
             record_name = f"{service}.{core.Aws.REGION}.amazonaws.com"
             vpc_association_authorization = AwsCustomResource(self, f"VpcAssociationAuthorization-{service}",
                 on_create={
-                    "assumed_role_arn": "arn:aws:iam::610408810780:role/ProServeApgCentralisedVpcEndpoints-R53Role778AB903-DK5I6NEW48MZ",
+                    "assumed_role_arn": AssumeRoleARN,
                     "service": "Route53",
                     "action": "createVPCAssociationAuthorization",
                     "parameters": {
@@ -156,6 +156,7 @@ class ProServeApgCentralisedVpcEndpointsSpokeStack(cdk.Stack):
                 policy=AwsCustomResourcePolicy.from_sdk_calls(resources=AwsCustomResourcePolicy.ANY_RESOURCE)
             )
             ### awscustomresource does not like two in a row as it gets confused with the Roles/Permissions - so will create my own Lambda
+            ### (I could do both in the same Lambda but thought it would be nice to show examples of both methods)
             R53_Lambda = _lambda.Function(
                 self, f'R53AssociateFunctionFor{service.upper()}',
                 runtime=_lambda.Runtime.PYTHON_3_7,
@@ -176,7 +177,7 @@ class ProServeApgCentralisedVpcEndpointsSpokeStack(cdk.Stack):
                     "AccountID": core.Aws.ACCOUNT_ID
                 },
             )
-
+            # Ensure that the Authorization Custom Resource is completed before the Association Lambda
             R53CustomResource.node.add_dependency(vpc_association_authorization)
 
 

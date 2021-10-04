@@ -40,6 +40,12 @@ Once the virtualenv is activated, you can install the required dependencies.
 pip install -r requirements.txt
 ```
 
+Once the environment has been configured, modify the app.py file to change/add any additiional VPC Endpoints you would like, e.g. if you wanted the VPC Endpoints for AWS Systems Manager
+
+```
+services =  ["ssm","ec2messages","ec2","ssmmessages","kms"]
+```
+
 At this point you can now synthesize the CloudFormation template for this code.
 
 ```
@@ -50,11 +56,22 @@ To add additional dependencies, for example other CDK libraries, just add
 them to your `setup.py` file and rerun the `pip install -r requirements.txt`
 command.
 
-Finally to install the Services Hub VPC Cloudformation Template
+To install the Services **Hub** VPC Cloudformation Template, use the following command with these parameters (with the Hub Credentials):
+* VPCId = VPC to install the VPC Endpoints
+* OrgCIDR = CIDR range for the Security Group on the VPC Endpoint (which IPs in your Org are allowed to use the Endpoints)
+* EndpointSubnetIdList = Subnets where the VPC Endpoints should be installed, minimum 2 is recommended
+* OrgID = Used to determine which accounts are allowed to Assume the Role and Authenticate VPCs to the Route53 Private Hosted Zone (PHZ)
+
 ```
-cdk deploy <Stack-Name> ProServeApgCentralisedVpcEndpointsHubStack --parameters VPCId=vpc-xxxxxxxxx --parameters OrgCIDR=xx.xx.xx.xx/xx --parameters EndpointSubnetIdList="subnet-xxxxxxxxx, subnet-xxxxxxxxxx, subnet-xxxxxxx"
+cdk deploy <Stack-Name> --parameters VPCId=vpc-xxxxxxxxx --parameters OrgCIDR=xx.xx.xx.xx/xx --parameters EndpointSubnetIdList="subnet-xxxxxxxxx, subnet-xxxxxxxxxx, subnet-xxxxxxx"  --parameters OrgID=o-xxxxxxxxxx
 ```
 
+To install the Services **Spoke** VPC Cloudformation Template, use the following command with these parameters (with the Spoke Credentials):
+* VPCId = VPC to associate to the Hub's PHZ 
+* R53HubRoleToAssume = Route53 Hub Role to Assume for Authenticating the VPC against the PHZ, provided from the output of the Hub
+* Route53DomainIDFor<Service1> = Route53 PHZ Domain ID to Authenticate and Associate against, 1 per Servuce, provided from the output of the Hub
+
+cdk deploy <Stack-Name> --parameters VPCId=vpc-xxxxxxxxx -parameters R53HubRoleToAssume=arn:aws:iam::xxxxxxxxxxxx:role/xxxxxxxxxxxx --parameters Route53DomainIDFor<Service1>=xxxxxxxxxxxxxxxxxxxxx, Route53DomainIDFor<Service2>=xxxxxxxxxxxxxxxxxxxxx, etc.
 ### Useful commands
 
  * `cdk ls`          list all stacks in the app
