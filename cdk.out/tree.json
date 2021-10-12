@@ -1,0 +1,1244 @@
+{
+  "version": "tree-0.1",
+  "tree": {
+    "id": "App",
+    "path": "",
+    "children": {
+      "Tree": {
+        "id": "Tree",
+        "path": "Tree",
+        "constructInfo": {
+          "fqn": "@aws-cdk/core.Construct",
+          "version": "1.122.0"
+        }
+      },
+      "ProServeApgCentralisedVpcEndpointsHubStack": {
+        "id": "ProServeApgCentralisedVpcEndpointsHubStack",
+        "path": "ProServeApgCentralisedVpcEndpointsHubStack",
+        "children": {
+          "VPCId": {
+            "id": "VPCId",
+            "path": "ProServeApgCentralisedVpcEndpointsHubStack/VPCId",
+            "constructInfo": {
+              "fqn": "@aws-cdk/core.CfnParameter",
+              "version": "1.122.0"
+            }
+          },
+          "OrgCIDR": {
+            "id": "OrgCIDR",
+            "path": "ProServeApgCentralisedVpcEndpointsHubStack/OrgCIDR",
+            "constructInfo": {
+              "fqn": "@aws-cdk/core.CfnParameter",
+              "version": "1.122.0"
+            }
+          },
+          "OrgID": {
+            "id": "OrgID",
+            "path": "ProServeApgCentralisedVpcEndpointsHubStack/OrgID",
+            "constructInfo": {
+              "fqn": "@aws-cdk/core.CfnParameter",
+              "version": "1.122.0"
+            }
+          },
+          "EndpointSubnetIdList": {
+            "id": "EndpointSubnetIdList",
+            "path": "ProServeApgCentralisedVpcEndpointsHubStack/EndpointSubnetIdList",
+            "constructInfo": {
+              "fqn": "@aws-cdk/core.CfnParameter",
+              "version": "1.122.0"
+            }
+          },
+          "EndpointVPC": {
+            "id": "EndpointVPC",
+            "path": "ProServeApgCentralisedVpcEndpointsHubStack/EndpointVPC",
+            "constructInfo": {
+              "fqn": "@aws-cdk/core.Resource",
+              "version": "1.122.0"
+            }
+          },
+          "SecurityGroupForEndpoints": {
+            "id": "SecurityGroupForEndpoints",
+            "path": "ProServeApgCentralisedVpcEndpointsHubStack/SecurityGroupForEndpoints",
+            "children": {
+              "Resource": {
+                "id": "Resource",
+                "path": "ProServeApgCentralisedVpcEndpointsHubStack/SecurityGroupForEndpoints/Resource",
+                "attributes": {
+                  "aws:cdk:cloudformation:type": "AWS::EC2::SecurityGroup",
+                  "aws:cdk:cloudformation:props": {
+                    "groupDescription": "ProServeApgCentralisedVpcEndpointsHubStack/SecurityGroupForEndpoints",
+                    "securityGroupEgress": [
+                      {
+                        "cidrIp": "0.0.0.0/0",
+                        "description": "Allow all outbound traffic by default",
+                        "ipProtocol": "-1"
+                      }
+                    ],
+                    "securityGroupIngress": [
+                      {
+                        "cidrIp": {
+                          "Ref": "OrgCIDR"
+                        },
+                        "ipProtocol": "tcp",
+                        "fromPort": 443,
+                        "toPort": 443,
+                        "description": {
+                          "Fn::Join": [
+                            "",
+                            [
+                              "from ",
+                              {
+                                "Ref": "OrgCIDR"
+                              },
+                              ":TTA"
+                            ]
+                          ]
+                        }
+                      }
+                    ],
+                    "vpcId": {
+                      "Ref": "VPCId"
+                    }
+                  }
+                },
+                "constructInfo": {
+                  "fqn": "@aws-cdk/aws-ec2.CfnSecurityGroup",
+                  "version": "1.122.0"
+                }
+              }
+            },
+            "constructInfo": {
+              "fqn": "@aws-cdk/aws-ec2.SecurityGroup",
+              "version": "1.122.0"
+            }
+          },
+          "R53 Role": {
+            "id": "R53 Role",
+            "path": "ProServeApgCentralisedVpcEndpointsHubStack/R53 Role",
+            "children": {
+              "Resource": {
+                "id": "Resource",
+                "path": "ProServeApgCentralisedVpcEndpointsHubStack/R53 Role/Resource",
+                "attributes": {
+                  "aws:cdk:cloudformation:type": "AWS::IAM::Role",
+                  "aws:cdk:cloudformation:props": {
+                    "assumeRolePolicyDocument": {
+                      "Statement": [
+                        {
+                          "Action": "sts:AssumeRole",
+                          "Condition": {
+                            "StringEquals": {
+                              "aws:PrincipalOrgID": {
+                                "Ref": "OrgID"
+                              }
+                            }
+                          },
+                          "Effect": "Allow",
+                          "Principal": {
+                            "AWS": "*"
+                          }
+                        }
+                      ],
+                      "Version": "2012-10-17"
+                    }
+                  }
+                },
+                "constructInfo": {
+                  "fqn": "@aws-cdk/aws-iam.CfnRole",
+                  "version": "1.122.0"
+                }
+              },
+              "DefaultPolicy": {
+                "id": "DefaultPolicy",
+                "path": "ProServeApgCentralisedVpcEndpointsHubStack/R53 Role/DefaultPolicy",
+                "children": {
+                  "Resource": {
+                    "id": "Resource",
+                    "path": "ProServeApgCentralisedVpcEndpointsHubStack/R53 Role/DefaultPolicy/Resource",
+                    "attributes": {
+                      "aws:cdk:cloudformation:type": "AWS::IAM::Policy",
+                      "aws:cdk:cloudformation:props": {
+                        "policyDocument": {
+                          "Statement": [
+                            {
+                              "Action": [
+                                "route53:CreateVPCAssociationAuthorization",
+                                "route53:DeleteVPCAssociationAuthorization"
+                              ],
+                              "Effect": "Allow",
+                              "Resource": "*"
+                            }
+                          ],
+                          "Version": "2012-10-17"
+                        },
+                        "policyName": "R53RoleDefaultPolicy70517911",
+                        "roles": [
+                          {
+                            "Ref": "R53Role778AB903"
+                          }
+                        ]
+                      }
+                    },
+                    "constructInfo": {
+                      "fqn": "@aws-cdk/aws-iam.CfnPolicy",
+                      "version": "1.122.0"
+                    }
+                  }
+                },
+                "constructInfo": {
+                  "fqn": "@aws-cdk/aws-iam.Policy",
+                  "version": "1.122.0"
+                }
+              }
+            },
+            "constructInfo": {
+              "fqn": "@aws-cdk/aws-iam.Role",
+              "version": "1.122.0"
+            }
+          },
+          "EndpointForsqs": {
+            "id": "EndpointForsqs",
+            "path": "ProServeApgCentralisedVpcEndpointsHubStack/EndpointForsqs",
+            "attributes": {
+              "aws:cdk:cloudformation:type": "AWS::EC2::VPCEndpoint",
+              "aws:cdk:cloudformation:props": {
+                "serviceName": {
+                  "Fn::Join": [
+                    "",
+                    [
+                      "com.amazonaws.",
+                      {
+                        "Ref": "AWS::Region"
+                      },
+                      ".sqs"
+                    ]
+                  ]
+                },
+                "vpcId": {
+                  "Ref": "VPCId"
+                },
+                "privateDnsEnabled": false,
+                "securityGroupIds": [
+                  {
+                    "Fn::GetAtt": [
+                      "SecurityGroupForEndpointsF9C56E0E",
+                      "GroupId"
+                    ]
+                  }
+                ],
+                "subnetIds": {
+                  "Ref": "EndpointSubnetIdList"
+                },
+                "vpcEndpointType": "Interface"
+              }
+            },
+            "constructInfo": {
+              "fqn": "@aws-cdk/aws-ec2.CfnVPCEndpoint",
+              "version": "1.122.0"
+            }
+          },
+          "PrivateZoneForsqs": {
+            "id": "PrivateZoneForsqs",
+            "path": "ProServeApgCentralisedVpcEndpointsHubStack/PrivateZoneForsqs",
+            "children": {
+              "Resource": {
+                "id": "Resource",
+                "path": "ProServeApgCentralisedVpcEndpointsHubStack/PrivateZoneForsqs/Resource",
+                "attributes": {
+                  "aws:cdk:cloudformation:type": "AWS::Route53::HostedZone",
+                  "aws:cdk:cloudformation:props": {
+                    "name": {
+                      "Fn::Join": [
+                        "",
+                        [
+                          "sqs.",
+                          {
+                            "Ref": "AWS::Region"
+                          },
+                          ".amazonaws.com."
+                        ]
+                      ]
+                    },
+                    "vpcs": [
+                      {
+                        "vpcId": {
+                          "Ref": "VPCId"
+                        },
+                        "vpcRegion": {
+                          "Ref": "AWS::Region"
+                        }
+                      }
+                    ]
+                  }
+                },
+                "constructInfo": {
+                  "fqn": "@aws-cdk/aws-route53.CfnHostedZone",
+                  "version": "1.122.0"
+                }
+              }
+            },
+            "constructInfo": {
+              "fqn": "@aws-cdk/aws-route53.PrivateHostedZone",
+              "version": "1.122.0"
+            }
+          },
+          "AliasRecordForsqs": {
+            "id": "AliasRecordForsqs",
+            "path": "ProServeApgCentralisedVpcEndpointsHubStack/AliasRecordForsqs",
+            "children": {
+              "Resource": {
+                "id": "Resource",
+                "path": "ProServeApgCentralisedVpcEndpointsHubStack/AliasRecordForsqs/Resource",
+                "attributes": {
+                  "aws:cdk:cloudformation:type": "AWS::Route53::RecordSet",
+                  "aws:cdk:cloudformation:props": {
+                    "name": {
+                      "Fn::Join": [
+                        "",
+                        [
+                          "sqs.",
+                          {
+                            "Ref": "AWS::Region"
+                          },
+                          ".amazonaws.com."
+                        ]
+                      ]
+                    },
+                    "type": "A",
+                    "aliasTarget": {
+                      "dnsName": {
+                        "Fn::Select": [
+                          1,
+                          {
+                            "Fn::Split": [
+                              ":",
+                              {
+                                "Fn::Select": [
+                                  0,
+                                  {
+                                    "Fn::GetAtt": [
+                                      "EndpointForsqs",
+                                      "DnsEntries"
+                                    ]
+                                  }
+                                ]
+                              }
+                            ]
+                          }
+                        ]
+                      },
+                      "hostedZoneId": {
+                        "Fn::Select": [
+                          0,
+                          {
+                            "Fn::Split": [
+                              ":",
+                              {
+                                "Fn::Select": [
+                                  0,
+                                  {
+                                    "Fn::GetAtt": [
+                                      "EndpointForsqs",
+                                      "DnsEntries"
+                                    ]
+                                  }
+                                ]
+                              }
+                            ]
+                          }
+                        ]
+                      }
+                    },
+                    "hostedZoneId": {
+                      "Ref": "PrivateZoneForsqsDE8AB875"
+                    }
+                  }
+                },
+                "constructInfo": {
+                  "fqn": "@aws-cdk/aws-route53.CfnRecordSet",
+                  "version": "1.122.0"
+                }
+              }
+            },
+            "constructInfo": {
+              "fqn": "@aws-cdk/aws-route53.RecordSet",
+              "version": "1.122.0"
+            }
+          },
+          "Route53DomainIDForSQS": {
+            "id": "Route53DomainIDForSQS",
+            "path": "ProServeApgCentralisedVpcEndpointsHubStack/Route53DomainIDForSQS",
+            "constructInfo": {
+              "fqn": "@aws-cdk/core.CfnOutput",
+              "version": "1.122.0"
+            }
+          },
+          "R53HubRoleToAssume": {
+            "id": "R53HubRoleToAssume",
+            "path": "ProServeApgCentralisedVpcEndpointsHubStack/R53HubRoleToAssume",
+            "constructInfo": {
+              "fqn": "@aws-cdk/core.CfnOutput",
+              "version": "1.122.0"
+            }
+          },
+          "CDKMetadata": {
+            "id": "CDKMetadata",
+            "path": "ProServeApgCentralisedVpcEndpointsHubStack/CDKMetadata",
+            "children": {
+              "Default": {
+                "id": "Default",
+                "path": "ProServeApgCentralisedVpcEndpointsHubStack/CDKMetadata/Default",
+                "constructInfo": {
+                  "fqn": "@aws-cdk/core.CfnResource",
+                  "version": "1.122.0"
+                }
+              },
+              "Condition": {
+                "id": "Condition",
+                "path": "ProServeApgCentralisedVpcEndpointsHubStack/CDKMetadata/Condition",
+                "constructInfo": {
+                  "fqn": "@aws-cdk/core.CfnCondition",
+                  "version": "1.122.0"
+                }
+              }
+            },
+            "constructInfo": {
+              "fqn": "@aws-cdk/core.Construct",
+              "version": "1.122.0"
+            }
+          }
+        },
+        "constructInfo": {
+          "fqn": "@aws-cdk/core.Stack",
+          "version": "1.122.0"
+        }
+      },
+      "ProServeApgCentralisedVpcEndpointsSpokeStack": {
+        "id": "ProServeApgCentralisedVpcEndpointsSpokeStack",
+        "path": "ProServeApgCentralisedVpcEndpointsSpokeStack",
+        "children": {
+          "VPCId": {
+            "id": "VPCId",
+            "path": "ProServeApgCentralisedVpcEndpointsSpokeStack/VPCId",
+            "constructInfo": {
+              "fqn": "@aws-cdk/core.CfnParameter",
+              "version": "1.122.0"
+            }
+          },
+          "R53HubRoleToAssume": {
+            "id": "R53HubRoleToAssume",
+            "path": "ProServeApgCentralisedVpcEndpointsSpokeStack/R53HubRoleToAssume",
+            "constructInfo": {
+              "fqn": "@aws-cdk/core.CfnParameter",
+              "version": "1.122.0"
+            }
+          },
+          "associate_vpc_lambda_role": {
+            "id": "associate_vpc_lambda_role",
+            "path": "ProServeApgCentralisedVpcEndpointsSpokeStack/associate_vpc_lambda_role",
+            "children": {
+              "Resource": {
+                "id": "Resource",
+                "path": "ProServeApgCentralisedVpcEndpointsSpokeStack/associate_vpc_lambda_role/Resource",
+                "attributes": {
+                  "aws:cdk:cloudformation:type": "AWS::IAM::Role",
+                  "aws:cdk:cloudformation:props": {
+                    "assumeRolePolicyDocument": {
+                      "Statement": [
+                        {
+                          "Action": "sts:AssumeRole",
+                          "Effect": "Allow",
+                          "Principal": {
+                            "Service": "lambda.amazonaws.com"
+                          }
+                        }
+                      ],
+                      "Version": "2012-10-17"
+                    },
+                    "managedPolicyArns": [
+                      {
+                        "Fn::Join": [
+                          "",
+                          [
+                            "arn:",
+                            {
+                              "Ref": "AWS::Partition"
+                            },
+                            ":iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+                          ]
+                        ]
+                      },
+                      {
+                        "Fn::Join": [
+                          "",
+                          [
+                            "arn:",
+                            {
+                              "Ref": "AWS::Partition"
+                            },
+                            ":iam::aws:policy/service-role/AWSLambdaVPCAccessExecutionRole"
+                          ]
+                        ]
+                      }
+                    ]
+                  }
+                },
+                "constructInfo": {
+                  "fqn": "@aws-cdk/aws-iam.CfnRole",
+                  "version": "1.122.0"
+                }
+              },
+              "DefaultPolicy": {
+                "id": "DefaultPolicy",
+                "path": "ProServeApgCentralisedVpcEndpointsSpokeStack/associate_vpc_lambda_role/DefaultPolicy",
+                "children": {
+                  "Resource": {
+                    "id": "Resource",
+                    "path": "ProServeApgCentralisedVpcEndpointsSpokeStack/associate_vpc_lambda_role/DefaultPolicy/Resource",
+                    "attributes": {
+                      "aws:cdk:cloudformation:type": "AWS::IAM::Policy",
+                      "aws:cdk:cloudformation:props": {
+                        "policyDocument": {
+                          "Statement": [
+                            {
+                              "Action": "ec2:DescribeVpcs",
+                              "Effect": "Allow",
+                              "Resource": "*"
+                            },
+                            {
+                              "Action": [
+                                "route53:AssociateVPCWithHostedZone",
+                                "route53:DisassociateVPCFromHostedZone"
+                              ],
+                              "Effect": "Allow",
+                              "Resource": [
+                                "arn:aws:route53:::hostedzone/*",
+                                {
+                                  "Fn::Join": [
+                                    "",
+                                    [
+                                      "arn:aws:ec2:",
+                                      {
+                                        "Ref": "AWS::Region"
+                                      },
+                                      ":",
+                                      {
+                                        "Ref": "AWS::AccountId"
+                                      },
+                                      ":vpc/",
+                                      {
+                                        "Ref": "VPCId"
+                                      }
+                                    ]
+                                  ]
+                                }
+                              ]
+                            },
+                            {
+                              "Action": "sts:AssumeRole",
+                              "Effect": "Allow",
+                              "Resource": {
+                                "Ref": "R53HubRoleToAssume"
+                              }
+                            }
+                          ],
+                          "Version": "2012-10-17"
+                        },
+                        "policyName": "associatevpclambdaroleDefaultPolicy78A7360B",
+                        "roles": [
+                          {
+                            "Ref": "associatevpclambdarole202F4C4E"
+                          }
+                        ]
+                      }
+                    },
+                    "constructInfo": {
+                      "fqn": "@aws-cdk/aws-iam.CfnPolicy",
+                      "version": "1.122.0"
+                    }
+                  }
+                },
+                "constructInfo": {
+                  "fqn": "@aws-cdk/aws-iam.Policy",
+                  "version": "1.122.0"
+                }
+              }
+            },
+            "constructInfo": {
+              "fqn": "@aws-cdk/aws-iam.Role",
+              "version": "1.122.0"
+            }
+          },
+          "R53AuthenticateAssociateVPC": {
+            "id": "R53AuthenticateAssociateVPC",
+            "path": "ProServeApgCentralisedVpcEndpointsSpokeStack/R53AuthenticateAssociateVPC",
+            "children": {
+              "Code": {
+                "id": "Code",
+                "path": "ProServeApgCentralisedVpcEndpointsSpokeStack/R53AuthenticateAssociateVPC/Code",
+                "children": {
+                  "Stage": {
+                    "id": "Stage",
+                    "path": "ProServeApgCentralisedVpcEndpointsSpokeStack/R53AuthenticateAssociateVPC/Code/Stage",
+                    "constructInfo": {
+                      "fqn": "@aws-cdk/core.AssetStaging",
+                      "version": "1.122.0"
+                    }
+                  },
+                  "AssetBucket": {
+                    "id": "AssetBucket",
+                    "path": "ProServeApgCentralisedVpcEndpointsSpokeStack/R53AuthenticateAssociateVPC/Code/AssetBucket",
+                    "children": {
+                      "Notifications": {
+                        "id": "Notifications",
+                        "path": "ProServeApgCentralisedVpcEndpointsSpokeStack/R53AuthenticateAssociateVPC/Code/AssetBucket/Notifications",
+                        "constructInfo": {
+                          "fqn": "@aws-cdk/core.Construct",
+                          "version": "1.122.0"
+                        }
+                      }
+                    },
+                    "constructInfo": {
+                      "fqn": "@aws-cdk/aws-s3.BucketBase",
+                      "version": "1.122.0"
+                    }
+                  }
+                },
+                "constructInfo": {
+                  "fqn": "@aws-cdk/aws-s3-assets.Asset",
+                  "version": "1.122.0"
+                }
+              },
+              "Resource": {
+                "id": "Resource",
+                "path": "ProServeApgCentralisedVpcEndpointsSpokeStack/R53AuthenticateAssociateVPC/Resource",
+                "attributes": {
+                  "aws:cdk:cloudformation:type": "AWS::Lambda::Function",
+                  "aws:cdk:cloudformation:props": {
+                    "code": {
+                      "s3Bucket": {
+                        "Ref": "AssetParameters55f290eb6c4f86222738bd00feb71fa3420edef87d2b80ab103925f37af6ced0S3Bucket000ECB23"
+                      },
+                      "s3Key": {
+                        "Fn::Join": [
+                          "",
+                          [
+                            {
+                              "Fn::Select": [
+                                0,
+                                {
+                                  "Fn::Split": [
+                                    "||",
+                                    {
+                                      "Ref": "AssetParameters55f290eb6c4f86222738bd00feb71fa3420edef87d2b80ab103925f37af6ced0S3VersionKey3141E0FD"
+                                    }
+                                  ]
+                                }
+                              ]
+                            },
+                            {
+                              "Fn::Select": [
+                                1,
+                                {
+                                  "Fn::Split": [
+                                    "||",
+                                    {
+                                      "Ref": "AssetParameters55f290eb6c4f86222738bd00feb71fa3420edef87d2b80ab103925f37af6ced0S3VersionKey3141E0FD"
+                                    }
+                                  ]
+                                }
+                              ]
+                            }
+                          ]
+                        ]
+                      }
+                    },
+                    "role": {
+                      "Fn::GetAtt": [
+                        "associatevpclambdarole202F4C4E",
+                        "Arn"
+                      ]
+                    },
+                    "handler": "R53Associate.handler",
+                    "runtime": "python3.7"
+                  }
+                },
+                "constructInfo": {
+                  "fqn": "@aws-cdk/aws-lambda.CfnFunction",
+                  "version": "1.122.0"
+                }
+              }
+            },
+            "constructInfo": {
+              "fqn": "@aws-cdk/aws-lambda.Function",
+              "version": "1.122.0"
+            }
+          },
+          "AssetParameters": {
+            "id": "AssetParameters",
+            "path": "ProServeApgCentralisedVpcEndpointsSpokeStack/AssetParameters",
+            "children": {
+              "55f290eb6c4f86222738bd00feb71fa3420edef87d2b80ab103925f37af6ced0": {
+                "id": "55f290eb6c4f86222738bd00feb71fa3420edef87d2b80ab103925f37af6ced0",
+                "path": "ProServeApgCentralisedVpcEndpointsSpokeStack/AssetParameters/55f290eb6c4f86222738bd00feb71fa3420edef87d2b80ab103925f37af6ced0",
+                "children": {
+                  "S3Bucket": {
+                    "id": "S3Bucket",
+                    "path": "ProServeApgCentralisedVpcEndpointsSpokeStack/AssetParameters/55f290eb6c4f86222738bd00feb71fa3420edef87d2b80ab103925f37af6ced0/S3Bucket",
+                    "constructInfo": {
+                      "fqn": "@aws-cdk/core.CfnParameter",
+                      "version": "1.122.0"
+                    }
+                  },
+                  "S3VersionKey": {
+                    "id": "S3VersionKey",
+                    "path": "ProServeApgCentralisedVpcEndpointsSpokeStack/AssetParameters/55f290eb6c4f86222738bd00feb71fa3420edef87d2b80ab103925f37af6ced0/S3VersionKey",
+                    "constructInfo": {
+                      "fqn": "@aws-cdk/core.CfnParameter",
+                      "version": "1.122.0"
+                    }
+                  },
+                  "ArtifactHash": {
+                    "id": "ArtifactHash",
+                    "path": "ProServeApgCentralisedVpcEndpointsSpokeStack/AssetParameters/55f290eb6c4f86222738bd00feb71fa3420edef87d2b80ab103925f37af6ced0/ArtifactHash",
+                    "constructInfo": {
+                      "fqn": "@aws-cdk/core.CfnParameter",
+                      "version": "1.122.0"
+                    }
+                  }
+                },
+                "constructInfo": {
+                  "fqn": "@aws-cdk/core.Construct",
+                  "version": "1.122.0"
+                }
+              },
+              "c691172cdeefa2c91b5a2907f9d81118e47597634943344795f1a844192dd49c": {
+                "id": "c691172cdeefa2c91b5a2907f9d81118e47597634943344795f1a844192dd49c",
+                "path": "ProServeApgCentralisedVpcEndpointsSpokeStack/AssetParameters/c691172cdeefa2c91b5a2907f9d81118e47597634943344795f1a844192dd49c",
+                "children": {
+                  "S3Bucket": {
+                    "id": "S3Bucket",
+                    "path": "ProServeApgCentralisedVpcEndpointsSpokeStack/AssetParameters/c691172cdeefa2c91b5a2907f9d81118e47597634943344795f1a844192dd49c/S3Bucket",
+                    "constructInfo": {
+                      "fqn": "@aws-cdk/core.CfnParameter",
+                      "version": "1.122.0"
+                    }
+                  },
+                  "S3VersionKey": {
+                    "id": "S3VersionKey",
+                    "path": "ProServeApgCentralisedVpcEndpointsSpokeStack/AssetParameters/c691172cdeefa2c91b5a2907f9d81118e47597634943344795f1a844192dd49c/S3VersionKey",
+                    "constructInfo": {
+                      "fqn": "@aws-cdk/core.CfnParameter",
+                      "version": "1.122.0"
+                    }
+                  },
+                  "ArtifactHash": {
+                    "id": "ArtifactHash",
+                    "path": "ProServeApgCentralisedVpcEndpointsSpokeStack/AssetParameters/c691172cdeefa2c91b5a2907f9d81118e47597634943344795f1a844192dd49c/ArtifactHash",
+                    "constructInfo": {
+                      "fqn": "@aws-cdk/core.CfnParameter",
+                      "version": "1.122.0"
+                    }
+                  }
+                },
+                "constructInfo": {
+                  "fqn": "@aws-cdk/core.Construct",
+                  "version": "1.122.0"
+                }
+              },
+              "67b7823b74bc135986aa72f889d6a8da058d0c4a20cbc2dfc6f78995fdd2fc24": {
+                "id": "67b7823b74bc135986aa72f889d6a8da058d0c4a20cbc2dfc6f78995fdd2fc24",
+                "path": "ProServeApgCentralisedVpcEndpointsSpokeStack/AssetParameters/67b7823b74bc135986aa72f889d6a8da058d0c4a20cbc2dfc6f78995fdd2fc24",
+                "children": {
+                  "S3Bucket": {
+                    "id": "S3Bucket",
+                    "path": "ProServeApgCentralisedVpcEndpointsSpokeStack/AssetParameters/67b7823b74bc135986aa72f889d6a8da058d0c4a20cbc2dfc6f78995fdd2fc24/S3Bucket",
+                    "constructInfo": {
+                      "fqn": "@aws-cdk/core.CfnParameter",
+                      "version": "1.122.0"
+                    }
+                  },
+                  "S3VersionKey": {
+                    "id": "S3VersionKey",
+                    "path": "ProServeApgCentralisedVpcEndpointsSpokeStack/AssetParameters/67b7823b74bc135986aa72f889d6a8da058d0c4a20cbc2dfc6f78995fdd2fc24/S3VersionKey",
+                    "constructInfo": {
+                      "fqn": "@aws-cdk/core.CfnParameter",
+                      "version": "1.122.0"
+                    }
+                  },
+                  "ArtifactHash": {
+                    "id": "ArtifactHash",
+                    "path": "ProServeApgCentralisedVpcEndpointsSpokeStack/AssetParameters/67b7823b74bc135986aa72f889d6a8da058d0c4a20cbc2dfc6f78995fdd2fc24/ArtifactHash",
+                    "constructInfo": {
+                      "fqn": "@aws-cdk/core.CfnParameter",
+                      "version": "1.122.0"
+                    }
+                  }
+                },
+                "constructInfo": {
+                  "fqn": "@aws-cdk/core.Construct",
+                  "version": "1.122.0"
+                }
+              }
+            },
+            "constructInfo": {
+              "fqn": "@aws-cdk/core.Construct",
+              "version": "1.122.0"
+            }
+          },
+          "Provider_For_R53_Lambda": {
+            "id": "Provider_For_R53_Lambda",
+            "path": "ProServeApgCentralisedVpcEndpointsSpokeStack/Provider_For_R53_Lambda",
+            "children": {
+              "framework-onEvent": {
+                "id": "framework-onEvent",
+                "path": "ProServeApgCentralisedVpcEndpointsSpokeStack/Provider_For_R53_Lambda/framework-onEvent",
+                "children": {
+                  "ServiceRole": {
+                    "id": "ServiceRole",
+                    "path": "ProServeApgCentralisedVpcEndpointsSpokeStack/Provider_For_R53_Lambda/framework-onEvent/ServiceRole",
+                    "children": {
+                      "Resource": {
+                        "id": "Resource",
+                        "path": "ProServeApgCentralisedVpcEndpointsSpokeStack/Provider_For_R53_Lambda/framework-onEvent/ServiceRole/Resource",
+                        "attributes": {
+                          "aws:cdk:cloudformation:type": "AWS::IAM::Role",
+                          "aws:cdk:cloudformation:props": {
+                            "assumeRolePolicyDocument": {
+                              "Statement": [
+                                {
+                                  "Action": "sts:AssumeRole",
+                                  "Effect": "Allow",
+                                  "Principal": {
+                                    "Service": "lambda.amazonaws.com"
+                                  }
+                                }
+                              ],
+                              "Version": "2012-10-17"
+                            },
+                            "managedPolicyArns": [
+                              {
+                                "Fn::Join": [
+                                  "",
+                                  [
+                                    "arn:",
+                                    {
+                                      "Ref": "AWS::Partition"
+                                    },
+                                    ":iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+                                  ]
+                                ]
+                              }
+                            ]
+                          }
+                        },
+                        "constructInfo": {
+                          "fqn": "@aws-cdk/aws-iam.CfnRole",
+                          "version": "1.122.0"
+                        }
+                      },
+                      "DefaultPolicy": {
+                        "id": "DefaultPolicy",
+                        "path": "ProServeApgCentralisedVpcEndpointsSpokeStack/Provider_For_R53_Lambda/framework-onEvent/ServiceRole/DefaultPolicy",
+                        "children": {
+                          "Resource": {
+                            "id": "Resource",
+                            "path": "ProServeApgCentralisedVpcEndpointsSpokeStack/Provider_For_R53_Lambda/framework-onEvent/ServiceRole/DefaultPolicy/Resource",
+                            "attributes": {
+                              "aws:cdk:cloudformation:type": "AWS::IAM::Policy",
+                              "aws:cdk:cloudformation:props": {
+                                "policyDocument": {
+                                  "Statement": [
+                                    {
+                                      "Action": "lambda:InvokeFunction",
+                                      "Effect": "Allow",
+                                      "Resource": {
+                                        "Fn::GetAtt": [
+                                          "R53AuthenticateAssociateVPC61052837",
+                                          "Arn"
+                                        ]
+                                      }
+                                    }
+                                  ],
+                                  "Version": "2012-10-17"
+                                },
+                                "policyName": "ProviderForR53LambdaframeworkonEventServiceRoleDefaultPolicy9AE9C977",
+                                "roles": [
+                                  {
+                                    "Ref": "ProviderForR53LambdaframeworkonEventServiceRole5C4BE3C5"
+                                  }
+                                ]
+                              }
+                            },
+                            "constructInfo": {
+                              "fqn": "@aws-cdk/aws-iam.CfnPolicy",
+                              "version": "1.122.0"
+                            }
+                          }
+                        },
+                        "constructInfo": {
+                          "fqn": "@aws-cdk/aws-iam.Policy",
+                          "version": "1.122.0"
+                        }
+                      }
+                    },
+                    "constructInfo": {
+                      "fqn": "@aws-cdk/aws-iam.Role",
+                      "version": "1.122.0"
+                    }
+                  },
+                  "Code": {
+                    "id": "Code",
+                    "path": "ProServeApgCentralisedVpcEndpointsSpokeStack/Provider_For_R53_Lambda/framework-onEvent/Code",
+                    "children": {
+                      "Stage": {
+                        "id": "Stage",
+                        "path": "ProServeApgCentralisedVpcEndpointsSpokeStack/Provider_For_R53_Lambda/framework-onEvent/Code/Stage",
+                        "constructInfo": {
+                          "fqn": "@aws-cdk/core.AssetStaging",
+                          "version": "1.122.0"
+                        }
+                      },
+                      "AssetBucket": {
+                        "id": "AssetBucket",
+                        "path": "ProServeApgCentralisedVpcEndpointsSpokeStack/Provider_For_R53_Lambda/framework-onEvent/Code/AssetBucket",
+                        "children": {
+                          "Notifications": {
+                            "id": "Notifications",
+                            "path": "ProServeApgCentralisedVpcEndpointsSpokeStack/Provider_For_R53_Lambda/framework-onEvent/Code/AssetBucket/Notifications",
+                            "constructInfo": {
+                              "fqn": "@aws-cdk/core.Construct",
+                              "version": "1.122.0"
+                            }
+                          }
+                        },
+                        "constructInfo": {
+                          "fqn": "@aws-cdk/aws-s3.BucketBase",
+                          "version": "1.122.0"
+                        }
+                      }
+                    },
+                    "constructInfo": {
+                      "fqn": "@aws-cdk/aws-s3-assets.Asset",
+                      "version": "1.122.0"
+                    }
+                  },
+                  "Resource": {
+                    "id": "Resource",
+                    "path": "ProServeApgCentralisedVpcEndpointsSpokeStack/Provider_For_R53_Lambda/framework-onEvent/Resource",
+                    "attributes": {
+                      "aws:cdk:cloudformation:type": "AWS::Lambda::Function",
+                      "aws:cdk:cloudformation:props": {
+                        "code": {
+                          "s3Bucket": {
+                            "Ref": "AssetParametersc691172cdeefa2c91b5a2907f9d81118e47597634943344795f1a844192dd49cS3BucketEAC9DD43"
+                          },
+                          "s3Key": {
+                            "Fn::Join": [
+                              "",
+                              [
+                                {
+                                  "Fn::Select": [
+                                    0,
+                                    {
+                                      "Fn::Split": [
+                                        "||",
+                                        {
+                                          "Ref": "AssetParametersc691172cdeefa2c91b5a2907f9d81118e47597634943344795f1a844192dd49cS3VersionKeyDD9AE9E7"
+                                        }
+                                      ]
+                                    }
+                                  ]
+                                },
+                                {
+                                  "Fn::Select": [
+                                    1,
+                                    {
+                                      "Fn::Split": [
+                                        "||",
+                                        {
+                                          "Ref": "AssetParametersc691172cdeefa2c91b5a2907f9d81118e47597634943344795f1a844192dd49cS3VersionKeyDD9AE9E7"
+                                        }
+                                      ]
+                                    }
+                                  ]
+                                }
+                              ]
+                            ]
+                          }
+                        },
+                        "role": {
+                          "Fn::GetAtt": [
+                            "ProviderForR53LambdaframeworkonEventServiceRole5C4BE3C5",
+                            "Arn"
+                          ]
+                        },
+                        "description": "AWS CDK resource provider framework - onEvent (ProServeApgCentralisedVpcEndpointsSpokeStack/Provider_For_R53_Lambda)",
+                        "environment": {
+                          "variables": {
+                            "USER_ON_EVENT_FUNCTION_ARN": {
+                              "Fn::GetAtt": [
+                                "R53AuthenticateAssociateVPC61052837",
+                                "Arn"
+                              ]
+                            }
+                          }
+                        },
+                        "handler": "framework.onEvent",
+                        "runtime": "nodejs14.x",
+                        "timeout": 900
+                      }
+                    },
+                    "constructInfo": {
+                      "fqn": "@aws-cdk/aws-lambda.CfnFunction",
+                      "version": "1.122.0"
+                    }
+                  },
+                  "LogRetention": {
+                    "id": "LogRetention",
+                    "path": "ProServeApgCentralisedVpcEndpointsSpokeStack/Provider_For_R53_Lambda/framework-onEvent/LogRetention",
+                    "children": {
+                      "Resource": {
+                        "id": "Resource",
+                        "path": "ProServeApgCentralisedVpcEndpointsSpokeStack/Provider_For_R53_Lambda/framework-onEvent/LogRetention/Resource",
+                        "constructInfo": {
+                          "fqn": "@aws-cdk/core.CfnResource",
+                          "version": "1.122.0"
+                        }
+                      }
+                    },
+                    "constructInfo": {
+                      "fqn": "@aws-cdk/aws-logs.LogRetention",
+                      "version": "1.122.0"
+                    }
+                  },
+                  "LogGroup": {
+                    "id": "LogGroup",
+                    "path": "ProServeApgCentralisedVpcEndpointsSpokeStack/Provider_For_R53_Lambda/framework-onEvent/LogGroup",
+                    "constructInfo": {
+                      "fqn": "@aws-cdk/core.Resource",
+                      "version": "1.122.0"
+                    }
+                  }
+                },
+                "constructInfo": {
+                  "fqn": "@aws-cdk/aws-lambda.Function",
+                  "version": "1.122.0"
+                }
+              }
+            },
+            "constructInfo": {
+              "fqn": "@aws-cdk/custom-resources.Provider",
+              "version": "1.122.0"
+            }
+          },
+          "LogRetentionaae0aa3c5b4d4f87b02d85b201efdd8a": {
+            "id": "LogRetentionaae0aa3c5b4d4f87b02d85b201efdd8a",
+            "path": "ProServeApgCentralisedVpcEndpointsSpokeStack/LogRetentionaae0aa3c5b4d4f87b02d85b201efdd8a",
+            "children": {
+              "Code": {
+                "id": "Code",
+                "path": "ProServeApgCentralisedVpcEndpointsSpokeStack/LogRetentionaae0aa3c5b4d4f87b02d85b201efdd8a/Code",
+                "children": {
+                  "Stage": {
+                    "id": "Stage",
+                    "path": "ProServeApgCentralisedVpcEndpointsSpokeStack/LogRetentionaae0aa3c5b4d4f87b02d85b201efdd8a/Code/Stage",
+                    "constructInfo": {
+                      "fqn": "@aws-cdk/core.AssetStaging",
+                      "version": "1.122.0"
+                    }
+                  },
+                  "AssetBucket": {
+                    "id": "AssetBucket",
+                    "path": "ProServeApgCentralisedVpcEndpointsSpokeStack/LogRetentionaae0aa3c5b4d4f87b02d85b201efdd8a/Code/AssetBucket",
+                    "children": {
+                      "Notifications": {
+                        "id": "Notifications",
+                        "path": "ProServeApgCentralisedVpcEndpointsSpokeStack/LogRetentionaae0aa3c5b4d4f87b02d85b201efdd8a/Code/AssetBucket/Notifications",
+                        "constructInfo": {
+                          "fqn": "@aws-cdk/core.Construct",
+                          "version": "1.122.0"
+                        }
+                      }
+                    },
+                    "constructInfo": {
+                      "fqn": "@aws-cdk/aws-s3.BucketBase",
+                      "version": "1.122.0"
+                    }
+                  }
+                },
+                "constructInfo": {
+                  "fqn": "@aws-cdk/aws-s3-assets.Asset",
+                  "version": "1.122.0"
+                }
+              },
+              "ServiceRole": {
+                "id": "ServiceRole",
+                "path": "ProServeApgCentralisedVpcEndpointsSpokeStack/LogRetentionaae0aa3c5b4d4f87b02d85b201efdd8a/ServiceRole",
+                "children": {
+                  "Resource": {
+                    "id": "Resource",
+                    "path": "ProServeApgCentralisedVpcEndpointsSpokeStack/LogRetentionaae0aa3c5b4d4f87b02d85b201efdd8a/ServiceRole/Resource",
+                    "attributes": {
+                      "aws:cdk:cloudformation:type": "AWS::IAM::Role",
+                      "aws:cdk:cloudformation:props": {
+                        "assumeRolePolicyDocument": {
+                          "Statement": [
+                            {
+                              "Action": "sts:AssumeRole",
+                              "Effect": "Allow",
+                              "Principal": {
+                                "Service": "lambda.amazonaws.com"
+                              }
+                            }
+                          ],
+                          "Version": "2012-10-17"
+                        },
+                        "managedPolicyArns": [
+                          {
+                            "Fn::Join": [
+                              "",
+                              [
+                                "arn:",
+                                {
+                                  "Ref": "AWS::Partition"
+                                },
+                                ":iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+                              ]
+                            ]
+                          }
+                        ]
+                      }
+                    },
+                    "constructInfo": {
+                      "fqn": "@aws-cdk/aws-iam.CfnRole",
+                      "version": "1.122.0"
+                    }
+                  },
+                  "DefaultPolicy": {
+                    "id": "DefaultPolicy",
+                    "path": "ProServeApgCentralisedVpcEndpointsSpokeStack/LogRetentionaae0aa3c5b4d4f87b02d85b201efdd8a/ServiceRole/DefaultPolicy",
+                    "children": {
+                      "Resource": {
+                        "id": "Resource",
+                        "path": "ProServeApgCentralisedVpcEndpointsSpokeStack/LogRetentionaae0aa3c5b4d4f87b02d85b201efdd8a/ServiceRole/DefaultPolicy/Resource",
+                        "attributes": {
+                          "aws:cdk:cloudformation:type": "AWS::IAM::Policy",
+                          "aws:cdk:cloudformation:props": {
+                            "policyDocument": {
+                              "Statement": [
+                                {
+                                  "Action": [
+                                    "logs:PutRetentionPolicy",
+                                    "logs:DeleteRetentionPolicy"
+                                  ],
+                                  "Effect": "Allow",
+                                  "Resource": "*"
+                                }
+                              ],
+                              "Version": "2012-10-17"
+                            },
+                            "policyName": "LogRetentionaae0aa3c5b4d4f87b02d85b201efdd8aServiceRoleDefaultPolicyADDA7DEB",
+                            "roles": [
+                              {
+                                "Ref": "LogRetentionaae0aa3c5b4d4f87b02d85b201efdd8aServiceRole9741ECFB"
+                              }
+                            ]
+                          }
+                        },
+                        "constructInfo": {
+                          "fqn": "@aws-cdk/aws-iam.CfnPolicy",
+                          "version": "1.122.0"
+                        }
+                      }
+                    },
+                    "constructInfo": {
+                      "fqn": "@aws-cdk/aws-iam.Policy",
+                      "version": "1.122.0"
+                    }
+                  }
+                },
+                "constructInfo": {
+                  "fqn": "@aws-cdk/aws-iam.Role",
+                  "version": "1.122.0"
+                }
+              },
+              "Resource": {
+                "id": "Resource",
+                "path": "ProServeApgCentralisedVpcEndpointsSpokeStack/LogRetentionaae0aa3c5b4d4f87b02d85b201efdd8a/Resource",
+                "constructInfo": {
+                  "fqn": "@aws-cdk/core.CfnResource",
+                  "version": "1.122.0"
+                }
+              }
+            },
+            "constructInfo": {
+              "fqn": "@aws-cdk/core.Construct",
+              "version": "1.122.0"
+            }
+          },
+          "Route53DomainIDForSQS": {
+            "id": "Route53DomainIDForSQS",
+            "path": "ProServeApgCentralisedVpcEndpointsSpokeStack/Route53DomainIDForSQS",
+            "constructInfo": {
+              "fqn": "@aws-cdk/core.CfnParameter",
+              "version": "1.122.0"
+            }
+          },
+          "R53AssociateCustomResourceForSQS": {
+            "id": "R53AssociateCustomResourceForSQS",
+            "path": "ProServeApgCentralisedVpcEndpointsSpokeStack/R53AssociateCustomResourceForSQS",
+            "children": {
+              "Default": {
+                "id": "Default",
+                "path": "ProServeApgCentralisedVpcEndpointsSpokeStack/R53AssociateCustomResourceForSQS/Default",
+                "constructInfo": {
+                  "fqn": "@aws-cdk/core.CfnResource",
+                  "version": "1.122.0"
+                }
+              }
+            },
+            "constructInfo": {
+              "fqn": "@aws-cdk/core.CustomResource",
+              "version": "1.122.0"
+            }
+          },
+          "CDKMetadata": {
+            "id": "CDKMetadata",
+            "path": "ProServeApgCentralisedVpcEndpointsSpokeStack/CDKMetadata",
+            "children": {
+              "Default": {
+                "id": "Default",
+                "path": "ProServeApgCentralisedVpcEndpointsSpokeStack/CDKMetadata/Default",
+                "constructInfo": {
+                  "fqn": "@aws-cdk/core.CfnResource",
+                  "version": "1.122.0"
+                }
+              },
+              "Condition": {
+                "id": "Condition",
+                "path": "ProServeApgCentralisedVpcEndpointsSpokeStack/CDKMetadata/Condition",
+                "constructInfo": {
+                  "fqn": "@aws-cdk/core.CfnCondition",
+                  "version": "1.122.0"
+                }
+              }
+            },
+            "constructInfo": {
+              "fqn": "@aws-cdk/core.Construct",
+              "version": "1.122.0"
+            }
+          }
+        },
+        "constructInfo": {
+          "fqn": "@aws-cdk/core.Stack",
+          "version": "1.122.0"
+        }
+      }
+    },
+    "constructInfo": {
+      "fqn": "@aws-cdk/core.App",
+      "version": "1.122.0"
+    }
+  }
+}

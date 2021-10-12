@@ -18,14 +18,22 @@ you can create the virtualenv manually.
 To manually create a virtualenv on MacOS and Linux:
 
 ```
+<<<<<<< HEAD
 python3 -m venv .venv
+=======
+$ python3 -m venv .venv
+>>>>>>> 3890023... Update README.md
 ```
 
 After the init process completes and the virtualenv is created, you can use the following
 step to activate your virtualenv.
 
 ```
+<<<<<<< HEAD
 source .venv/bin/activate
+=======
+$ source .venv/bin/activate
+>>>>>>> 3890023... Update README.md
 ```
 
 If you are a Windows platform, you would activate the virtualenv like this:
@@ -37,23 +45,34 @@ If you are a Windows platform, you would activate the virtualenv like this:
 Once the virtualenv is activated, you can install the required dependencies.
 
 ```
+<<<<<<< HEAD
 pip install -r requirements.txt
+=======
+$ pip install -r requirements.txt
+>>>>>>> 3890023... Update README.md
 ```
 
 At this point you can now synthesize the CloudFormation template for this code.
 
 ```
+<<<<<<< HEAD
 cdk synth
+=======
+$ cdk synth
+>>>>>>> 3890023... Update README.md
 ```
 
 To add additional dependencies, for example other CDK libraries, just add
 them to your `setup.py` file and rerun the `pip install -r requirements.txt`
 command.
 
+<<<<<<< HEAD
 Finally to install the Services Hub VPC Cloudformation Template
 ```
 cdk deploy <Stack-Name> ProServeApgCentralisedVpcEndpointsHubStack --parameters VPCId=vpc-xxxxxxxxx --parameters OrgCIDR=xx.xx.xx.xx/xx --parameters EndpointSubnetIdList="subnet-xxxxxxxxx, subnet-xxxxxxxxxx, subnet-xxxxxxx"
 
+=======
+>>>>>>> 3890023... Update README.md
 ### Useful commands
 
  * `cdk ls`          list all stacks in the app

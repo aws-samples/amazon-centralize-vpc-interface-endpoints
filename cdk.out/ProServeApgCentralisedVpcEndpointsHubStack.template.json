@@ -1,0 +1,476 @@
+{
+  "Parameters": {
+    "VPCId": {
+      "Type": "AWS::EC2::VPC::Id",
+      "AllowedPattern": "^vpc-.*$",
+      "Description": "The VPC where you want to place the endpoints"
+    },
+    "OrgCIDR": {
+      "Type": "String",
+      "AllowedPattern": "^[\\d]{1,3}\\.[\\d]{1,3}\\.[\\d]{1,3}\\.[\\d]{1,3}\\/[\\d]{1,3}$",
+      "ConstraintDescription": "CIDR should be in form X.X.X.X/X",
+      "Description": "The CIDR range that requests can originate from to use this endpoint."
+    },
+    "OrgID": {
+      "Type": "String",
+      "AllowedPattern": "^o-[a-z0-9]{10,32}",
+      "Description": "The Organization ID which you'll allow to associate with your Hosted Zone"
+    },
+    "EndpointSubnetIdList": {
+      "Type": "List<AWS::EC2::Subnet::Id>",
+      "AllowedPattern": "^subnet-.*$",
+      "Description": "The subnets to insert VPC endpoints into",
+      "MinLength": 1
+    }
+  },
+  "Resources": {
+    "SecurityGroupForEndpointsF9C56E0E": {
+      "Type": "AWS::EC2::SecurityGroup",
+      "Properties": {
+        "GroupDescription": "ProServeApgCentralisedVpcEndpointsHubStack/SecurityGroupForEndpoints",
+        "SecurityGroupEgress": [
+          {
+            "CidrIp": "0.0.0.0/0",
+            "Description": "Allow all outbound traffic by default",
+            "IpProtocol": "-1"
+          }
+        ],
+        "SecurityGroupIngress": [
+          {
+            "CidrIp": {
+              "Ref": "OrgCIDR"
+            },
+            "Description": {
+              "Fn::Join": [
+                "",
+                [
+                  "from ",
+                  {
+                    "Ref": "OrgCIDR"
+                  },
+                  ":TTA"
+                ]
+              ]
+            },
+            "FromPort": 443,
+            "IpProtocol": "tcp",
+            "ToPort": 443
+          }
+        ],
+        "VpcId": {
+          "Ref": "VPCId"
+        }
+      },
+      "Metadata": {
+        "aws:cdk:path": "ProServeApgCentralisedVpcEndpointsHubStack/SecurityGroupForEndpoints/Resource"
+      }
+    },
+    "R53Role778AB903": {
+      "Type": "AWS::IAM::Role",
+      "Properties": {
+        "AssumeRolePolicyDocument": {
+          "Statement": [
+            {
+              "Action": "sts:AssumeRole",
+              "Condition": {
+                "StringEquals": {
+                  "aws:PrincipalOrgID": {
+                    "Ref": "OrgID"
+                  }
+                }
+              },
+              "Effect": "Allow",
+              "Principal": {
+                "AWS": "*"
+              }
+            }
+          ],
+          "Version": "2012-10-17"
+        }
+      },
+      "Metadata": {
+        "aws:cdk:path": "ProServeApgCentralisedVpcEndpointsHubStack/R53 Role/Resource"
+      }
+    },
+    "R53RoleDefaultPolicy70517911": {
+      "Type": "AWS::IAM::Policy",
+      "Properties": {
+        "PolicyDocument": {
+          "Statement": [
+            {
+              "Action": [
+                "route53:CreateVPCAssociationAuthorization",
+                "route53:DeleteVPCAssociationAuthorization"
+              ],
+              "Effect": "Allow",
+              "Resource": "*"
+            }
+          ],
+          "Version": "2012-10-17"
+        },
+        "PolicyName": "R53RoleDefaultPolicy70517911",
+        "Roles": [
+          {
+            "Ref": "R53Role778AB903"
+          }
+        ]
+      },
+      "Metadata": {
+        "aws:cdk:path": "ProServeApgCentralisedVpcEndpointsHubStack/R53 Role/DefaultPolicy/Resource"
+      }
+    },
+    "EndpointForsqs": {
+      "Type": "AWS::EC2::VPCEndpoint",
+      "Properties": {
+        "ServiceName": {
+          "Fn::Join": [
+            "",
+            [
+              "com.amazonaws.",
+              {
+                "Ref": "AWS::Region"
+              },
+              ".sqs"
+            ]
+          ]
+        },
+        "VpcId": {
+          "Ref": "VPCId"
+        },
+        "PrivateDnsEnabled": false,
+        "SecurityGroupIds": [
+          {
+            "Fn::GetAtt": [
+              "SecurityGroupForEndpointsF9C56E0E",
+              "GroupId"
+            ]
+          }
+        ],
+        "SubnetIds": {
+          "Ref": "EndpointSubnetIdList"
+        },
+        "VpcEndpointType": "Interface"
+      },
+      "Metadata": {
+        "aws:cdk:path": "ProServeApgCentralisedVpcEndpointsHubStack/EndpointForsqs"
+      }
+    },
+    "PrivateZoneForsqsDE8AB875": {
+      "Type": "AWS::Route53::HostedZone",
+      "Properties": {
+        "Name": {
+          "Fn::Join": [
+            "",
+            [
+              "sqs.",
+              {
+                "Ref": "AWS::Region"
+              },
+              ".amazonaws.com."
+            ]
+          ]
+        },
+        "VPCs": [
+          {
+            "VPCId": {
+              "Ref": "VPCId"
+            },
+            "VPCRegion": {
+              "Ref": "AWS::Region"
+            }
+          }
+        ]
+      },
+      "Metadata": {
+        "aws:cdk:path": "ProServeApgCentralisedVpcEndpointsHubStack/PrivateZoneForsqs/Resource"
+      }
+    },
+    "AliasRecordForsqsFE983AE5": {
+      "Type": "AWS::Route53::RecordSet",
+      "Properties": {
+        "Name": {
+          "Fn::Join": [
+            "",
+            [
+              "sqs.",
+              {
+                "Ref": "AWS::Region"
+              },
+              ".amazonaws.com."
+            ]
+          ]
+        },
+        "Type": "A",
+        "AliasTarget": {
+          "DNSName": {
+            "Fn::Select": [
+              1,
+              {
+                "Fn::Split": [
+                  ":",
+                  {
+                    "Fn::Select": [
+                      0,
+                      {
+                        "Fn::GetAtt": [
+                          "EndpointForsqs",
+                          "DnsEntries"
+                        ]
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          },
+          "HostedZoneId": {
+            "Fn::Select": [
+              0,
+              {
+                "Fn::Split": [
+                  ":",
+                  {
+                    "Fn::Select": [
+                      0,
+                      {
+                        "Fn::GetAtt": [
+                          "EndpointForsqs",
+                          "DnsEntries"
+                        ]
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          }
+        },
+        "HostedZoneId": {
+          "Ref": "PrivateZoneForsqsDE8AB875"
+        }
+      },
+      "Metadata": {
+        "aws:cdk:path": "ProServeApgCentralisedVpcEndpointsHubStack/AliasRecordForsqs/Resource"
+      }
+    },
+    "CDKMetadata": {
+      "Type": "AWS::CDK::Metadata",
+      "Properties": {
+        "Analytics": "v2:deflate64:H4sIAAAAAAAA/2VPwWrDMAz9lt5dt0kp9DgIY73NpNBDb8bWmNbGCrK8Eoz/vYnXQ2En6b2n93hqdNO2ert6s/e4dv66yY4YdD6JdVfVfQVj2Q4gwKqHSIkdLOxnkjGJ6ihE4eRk4V71WfAoSKGoJTiDa+dMcIlRpg+mNC5X/4iz6d6DHwmDFIV20LmnWw2s09AN3VRb1a2o2Siw3+lsGH+twJGigL9QqKYX1MP8lz/Bs+kTlFKUmeSbwmanD7rZrn4i4ppTEBxA93/zAZJpjoskAQAA"
+      },
+      "Metadata": {
+        "aws:cdk:path": "ProServeApgCentralisedVpcEndpointsHubStack/CDKMetadata/Default"
+      },
+      "Condition": "CDKMetadataAvailable"
+    }
+  },
+  "Outputs": {
+    "Route53DomainIDForSQS": {
+      "Value": {
+        "Ref": "PrivateZoneForsqsDE8AB875"
+      }
+    },
+    "R53HubRoleToAssume": {
+      "Value": {
+        "Fn::GetAtt": [
+          "R53Role778AB903",
+          "Arn"
+        ]
+      }
+    }
+  },
+  "Conditions": {
+    "CDKMetadataAvailable": {
+      "Fn::Or": [
+        {
+          "Fn::Or": [
+            {
+              "Fn::Equals": [
+                {
+                  "Ref": "AWS::Region"
+                },
+                "af-south-1"
+              ]
+            },
+            {
+              "Fn::Equals": [
+                {
+                  "Ref": "AWS::Region"
+                },
+                "ap-east-1"
+              ]
+            },
+            {
+              "Fn::Equals": [
+                {
+                  "Ref": "AWS::Region"
+                },
+                "ap-northeast-1"
+              ]
+            },
+            {
+              "Fn::Equals": [
+                {
+                  "Ref": "AWS::Region"
+                },
+                "ap-northeast-2"
+              ]
+            },
+            {
+              "Fn::Equals": [
+                {
+                  "Ref": "AWS::Region"
+                },
+                "ap-south-1"
+              ]
+            },
+            {
+              "Fn::Equals": [
+                {
+                  "Ref": "AWS::Region"
+                },
+                "ap-southeast-1"
+              ]
+            },
+            {
+              "Fn::Equals": [
+                {
+                  "Ref": "AWS::Region"
+                },
+                "ap-southeast-2"
+              ]
+            },
+            {
+              "Fn::Equals": [
+                {
+                  "Ref": "AWS::Region"
+                },
+                "ca-central-1"
+              ]
+            },
+            {
+              "Fn::Equals": [
+                {
+                  "Ref": "AWS::Region"
+                },
+                "cn-north-1"
+              ]
+            },
+            {
+              "Fn::Equals": [
+                {
+                  "Ref": "AWS::Region"
+                },
+                "cn-northwest-1"
+              ]
+            }
+          ]
+        },
+        {
+          "Fn::Or": [
+            {
+              "Fn::Equals": [
+                {
+                  "Ref": "AWS::Region"
+                },
+                "eu-central-1"
+              ]
+            },
+            {
+              "Fn::Equals": [
+                {
+                  "Ref": "AWS::Region"
+                },
+                "eu-north-1"
+              ]
+            },
+            {
+              "Fn::Equals": [
+                {
+                  "Ref": "AWS::Region"
+                },
+                "eu-south-1"
+              ]
+            },
+            {
+              "Fn::Equals": [
+                {
+                  "Ref": "AWS::Region"
+                },
+                "eu-west-1"
+              ]
+            },
+            {
+              "Fn::Equals": [
+                {
+                  "Ref": "AWS::Region"
+                },
+                "eu-west-2"
+              ]
+            },
+            {
+              "Fn::Equals": [
+                {
+                  "Ref": "AWS::Region"
+                },
+                "eu-west-3"
+              ]
+            },
+            {
+              "Fn::Equals": [
+                {
+                  "Ref": "AWS::Region"
+                },
+                "me-south-1"
+              ]
+            },
+            {
+              "Fn::Equals": [
+                {
+                  "Ref": "AWS::Region"
+                },
+                "sa-east-1"
+              ]
+            },
+            {
+              "Fn::Equals": [
+                {
+                  "Ref": "AWS::Region"
+                },
+                "us-east-1"
+              ]
+            },
+            {
+              "Fn::Equals": [
+                {
+                  "Ref": "AWS::Region"
+                },
+                "us-east-2"
+              ]
+            }
+          ]
+        },
+        {
+          "Fn::Or": [
+            {
+              "Fn::Equals": [
+                {
+                  "Ref": "AWS::Region"
+                },
+                "us-west-1"
+              ]
+            },
+            {
+              "Fn::Equals": [
+                {
+                  "Ref": "AWS::Region"
+                },
+                "us-west-2"
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  }
+}

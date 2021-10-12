@@ -1,0 +1,735 @@
+{
+  "Parameters": {
+    "VPCId": {
+      "Type": "AWS::EC2::VPC::Id",
+      "AllowedPattern": "^vpc-.*$",
+      "Description": "The VPC that you want to use the centralised endpoints in."
+    },
+    "R53HubRoleToAssume": {
+      "Type": "String",
+      "AllowedPattern": "^arn:aws:iam::[\\d]{12}:role/.*$",
+      "Description": "The R53 Role in the Hub Account that allows us to Authorize a VPC to the Private Hosted Zone"
+    },
+    "AssetParameters55f290eb6c4f86222738bd00feb71fa3420edef87d2b80ab103925f37af6ced0S3Bucket000ECB23": {
+      "Type": "String",
+      "Description": "S3 bucket for asset \"55f290eb6c4f86222738bd00feb71fa3420edef87d2b80ab103925f37af6ced0\""
+    },
+    "AssetParameters55f290eb6c4f86222738bd00feb71fa3420edef87d2b80ab103925f37af6ced0S3VersionKey3141E0FD": {
+      "Type": "String",
+      "Description": "S3 key for asset version \"55f290eb6c4f86222738bd00feb71fa3420edef87d2b80ab103925f37af6ced0\""
+    },
+    "AssetParameters55f290eb6c4f86222738bd00feb71fa3420edef87d2b80ab103925f37af6ced0ArtifactHashF39BE696": {
+      "Type": "String",
+      "Description": "Artifact hash for asset \"55f290eb6c4f86222738bd00feb71fa3420edef87d2b80ab103925f37af6ced0\""
+    },
+    "AssetParametersc691172cdeefa2c91b5a2907f9d81118e47597634943344795f1a844192dd49cS3BucketEAC9DD43": {
+      "Type": "String",
+      "Description": "S3 bucket for asset \"c691172cdeefa2c91b5a2907f9d81118e47597634943344795f1a844192dd49c\""
+    },
+    "AssetParametersc691172cdeefa2c91b5a2907f9d81118e47597634943344795f1a844192dd49cS3VersionKeyDD9AE9E7": {
+      "Type": "String",
+      "Description": "S3 key for asset version \"c691172cdeefa2c91b5a2907f9d81118e47597634943344795f1a844192dd49c\""
+    },
+    "AssetParametersc691172cdeefa2c91b5a2907f9d81118e47597634943344795f1a844192dd49cArtifactHash627DAAA7": {
+      "Type": "String",
+      "Description": "Artifact hash for asset \"c691172cdeefa2c91b5a2907f9d81118e47597634943344795f1a844192dd49c\""
+    },
+    "AssetParameters67b7823b74bc135986aa72f889d6a8da058d0c4a20cbc2dfc6f78995fdd2fc24S3Bucket4D46ABB5": {
+      "Type": "String",
+      "Description": "S3 bucket for asset \"67b7823b74bc135986aa72f889d6a8da058d0c4a20cbc2dfc6f78995fdd2fc24\""
+    },
+    "AssetParameters67b7823b74bc135986aa72f889d6a8da058d0c4a20cbc2dfc6f78995fdd2fc24S3VersionKeyB0F28861": {
+      "Type": "String",
+      "Description": "S3 key for asset version \"67b7823b74bc135986aa72f889d6a8da058d0c4a20cbc2dfc6f78995fdd2fc24\""
+    },
+    "AssetParameters67b7823b74bc135986aa72f889d6a8da058d0c4a20cbc2dfc6f78995fdd2fc24ArtifactHashBA91B77F": {
+      "Type": "String",
+      "Description": "Artifact hash for asset \"67b7823b74bc135986aa72f889d6a8da058d0c4a20cbc2dfc6f78995fdd2fc24\""
+    },
+    "Route53DomainIDForSQS": {
+      "Type": "String",
+      "AllowedPattern": "^[A-Z0-9]{1,32}$",
+      "Description": "The route53 hosted zone id from the hub stack for the the SQS service,                     the string before the colon in <route53 hosted zone id>:<regional vpc endpoint dns name>"
+    }
+  },
+  "Resources": {
+    "associatevpclambdarole202F4C4E": {
+      "Type": "AWS::IAM::Role",
+      "Properties": {
+        "AssumeRolePolicyDocument": {
+          "Statement": [
+            {
+              "Action": "sts:AssumeRole",
+              "Effect": "Allow",
+              "Principal": {
+                "Service": "lambda.amazonaws.com"
+              }
+            }
+          ],
+          "Version": "2012-10-17"
+        },
+        "ManagedPolicyArns": [
+          {
+            "Fn::Join": [
+              "",
+              [
+                "arn:",
+                {
+                  "Ref": "AWS::Partition"
+                },
+                ":iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+              ]
+            ]
+          },
+          {
+            "Fn::Join": [
+              "",
+              [
+                "arn:",
+                {
+                  "Ref": "AWS::Partition"
+                },
+                ":iam::aws:policy/service-role/AWSLambdaVPCAccessExecutionRole"
+              ]
+            ]
+          }
+        ]
+      },
+      "Metadata": {
+        "aws:cdk:path": "ProServeApgCentralisedVpcEndpointsSpokeStack/associate_vpc_lambda_role/Resource"
+      }
+    },
+    "associatevpclambdaroleDefaultPolicy78A7360B": {
+      "Type": "AWS::IAM::Policy",
+      "Properties": {
+        "PolicyDocument": {
+          "Statement": [
+            {
+              "Action": "ec2:DescribeVpcs",
+              "Effect": "Allow",
+              "Resource": "*"
+            },
+            {
+              "Action": [
+                "route53:AssociateVPCWithHostedZone",
+                "route53:DisassociateVPCFromHostedZone"
+              ],
+              "Effect": "Allow",
+              "Resource": [
+                "arn:aws:route53:::hostedzone/*",
+                {
+                  "Fn::Join": [
+                    "",
+                    [
+                      "arn:aws:ec2:",
+                      {
+                        "Ref": "AWS::Region"
+                      },
+                      ":",
+                      {
+                        "Ref": "AWS::AccountId"
+                      },
+                      ":vpc/",
+                      {
+                        "Ref": "VPCId"
+                      }
+                    ]
+                  ]
+                }
+              ]
+            },
+            {
+              "Action": "sts:AssumeRole",
+              "Effect": "Allow",
+              "Resource": {
+                "Ref": "R53HubRoleToAssume"
+              }
+            }
+          ],
+          "Version": "2012-10-17"
+        },
+        "PolicyName": "associatevpclambdaroleDefaultPolicy78A7360B",
+        "Roles": [
+          {
+            "Ref": "associatevpclambdarole202F4C4E"
+          }
+        ]
+      },
+      "Metadata": {
+        "aws:cdk:path": "ProServeApgCentralisedVpcEndpointsSpokeStack/associate_vpc_lambda_role/DefaultPolicy/Resource"
+      }
+    },
+    "R53AuthenticateAssociateVPC61052837": {
+      "Type": "AWS::Lambda::Function",
+      "Properties": {
+        "Code": {
+          "S3Bucket": {
+            "Ref": "AssetParameters55f290eb6c4f86222738bd00feb71fa3420edef87d2b80ab103925f37af6ced0S3Bucket000ECB23"
+          },
+          "S3Key": {
+            "Fn::Join": [
+              "",
+              [
+                {
+                  "Fn::Select": [
+                    0,
+                    {
+                      "Fn::Split": [
+                        "||",
+                        {
+                          "Ref": "AssetParameters55f290eb6c4f86222738bd00feb71fa3420edef87d2b80ab103925f37af6ced0S3VersionKey3141E0FD"
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "Fn::Select": [
+                    1,
+                    {
+                      "Fn::Split": [
+                        "||",
+                        {
+                          "Ref": "AssetParameters55f290eb6c4f86222738bd00feb71fa3420edef87d2b80ab103925f37af6ced0S3VersionKey3141E0FD"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            ]
+          }
+        },
+        "Role": {
+          "Fn::GetAtt": [
+            "associatevpclambdarole202F4C4E",
+            "Arn"
+          ]
+        },
+        "Handler": "R53Associate.handler",
+        "Runtime": "python3.7"
+      },
+      "DependsOn": [
+        "associatevpclambdaroleDefaultPolicy78A7360B",
+        "associatevpclambdarole202F4C4E"
+      ],
+      "Metadata": {
+        "aws:cdk:path": "ProServeApgCentralisedVpcEndpointsSpokeStack/R53AuthenticateAssociateVPC/Resource",
+        "aws:asset:path": "asset.55f290eb6c4f86222738bd00feb71fa3420edef87d2b80ab103925f37af6ced0",
+        "aws:asset:property": "Code"
+      }
+    },
+    "ProviderForR53LambdaframeworkonEventServiceRole5C4BE3C5": {
+      "Type": "AWS::IAM::Role",
+      "Properties": {
+        "AssumeRolePolicyDocument": {
+          "Statement": [
+            {
+              "Action": "sts:AssumeRole",
+              "Effect": "Allow",
+              "Principal": {
+                "Service": "lambda.amazonaws.com"
+              }
+            }
+          ],
+          "Version": "2012-10-17"
+        },
+        "ManagedPolicyArns": [
+          {
+            "Fn::Join": [
+              "",
+              [
+                "arn:",
+                {
+                  "Ref": "AWS::Partition"
+                },
+                ":iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+              ]
+            ]
+          }
+        ]
+      },
+      "Metadata": {
+        "aws:cdk:path": "ProServeApgCentralisedVpcEndpointsSpokeStack/Provider_For_R53_Lambda/framework-onEvent/ServiceRole/Resource"
+      }
+    },
+    "ProviderForR53LambdaframeworkonEventServiceRoleDefaultPolicy9AE9C977": {
+      "Type": "AWS::IAM::Policy",
+      "Properties": {
+        "PolicyDocument": {
+          "Statement": [
+            {
+              "Action": "lambda:InvokeFunction",
+              "Effect": "Allow",
+              "Resource": {
+                "Fn::GetAtt": [
+                  "R53AuthenticateAssociateVPC61052837",
+                  "Arn"
+                ]
+              }
+            }
+          ],
+          "Version": "2012-10-17"
+        },
+        "PolicyName": "ProviderForR53LambdaframeworkonEventServiceRoleDefaultPolicy9AE9C977",
+        "Roles": [
+          {
+            "Ref": "ProviderForR53LambdaframeworkonEventServiceRole5C4BE3C5"
+          }
+        ]
+      },
+      "Metadata": {
+        "aws:cdk:path": "ProServeApgCentralisedVpcEndpointsSpokeStack/Provider_For_R53_Lambda/framework-onEvent/ServiceRole/DefaultPolicy/Resource"
+      }
+    },
+    "ProviderForR53LambdaframeworkonEvent7454F6D5": {
+      "Type": "AWS::Lambda::Function",
+      "Properties": {
+        "Code": {
+          "S3Bucket": {
+            "Ref": "AssetParametersc691172cdeefa2c91b5a2907f9d81118e47597634943344795f1a844192dd49cS3BucketEAC9DD43"
+          },
+          "S3Key": {
+            "Fn::Join": [
+              "",
+              [
+                {
+                  "Fn::Select": [
+                    0,
+                    {
+                      "Fn::Split": [
+                        "||",
+                        {
+                          "Ref": "AssetParametersc691172cdeefa2c91b5a2907f9d81118e47597634943344795f1a844192dd49cS3VersionKeyDD9AE9E7"
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "Fn::Select": [
+                    1,
+                    {
+                      "Fn::Split": [
+                        "||",
+                        {
+                          "Ref": "AssetParametersc691172cdeefa2c91b5a2907f9d81118e47597634943344795f1a844192dd49cS3VersionKeyDD9AE9E7"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            ]
+          }
+        },
+        "Role": {
+          "Fn::GetAtt": [
+            "ProviderForR53LambdaframeworkonEventServiceRole5C4BE3C5",
+            "Arn"
+          ]
+        },
+        "Description": "AWS CDK resource provider framework - onEvent (ProServeApgCentralisedVpcEndpointsSpokeStack/Provider_For_R53_Lambda)",
+        "Environment": {
+          "Variables": {
+            "USER_ON_EVENT_FUNCTION_ARN": {
+              "Fn::GetAtt": [
+                "R53AuthenticateAssociateVPC61052837",
+                "Arn"
+              ]
+            }
+          }
+        },
+        "Handler": "framework.onEvent",
+        "Runtime": "nodejs14.x",
+        "Timeout": 900
+      },
+      "DependsOn": [
+        "ProviderForR53LambdaframeworkonEventServiceRoleDefaultPolicy9AE9C977",
+        "ProviderForR53LambdaframeworkonEventServiceRole5C4BE3C5"
+      ],
+      "Metadata": {
+        "aws:cdk:path": "ProServeApgCentralisedVpcEndpointsSpokeStack/Provider_For_R53_Lambda/framework-onEvent/Resource",
+        "aws:asset:path": "asset.c691172cdeefa2c91b5a2907f9d81118e47597634943344795f1a844192dd49c",
+        "aws:asset:property": "Code"
+      }
+    },
+    "ProviderForR53LambdaframeworkonEventLogRetention7C4B8429": {
+      "Type": "Custom::LogRetention",
+      "Properties": {
+        "ServiceToken": {
+          "Fn::GetAtt": [
+            "LogRetentionaae0aa3c5b4d4f87b02d85b201efdd8aFD4BFC8A",
+            "Arn"
+          ]
+        },
+        "LogGroupName": {
+          "Fn::Join": [
+            "",
+            [
+              "/aws/lambda/",
+              {
+                "Ref": "ProviderForR53LambdaframeworkonEvent7454F6D5"
+              }
+            ]
+          ]
+        },
+        "RetentionInDays": 1
+      },
+      "Metadata": {
+        "aws:cdk:path": "ProServeApgCentralisedVpcEndpointsSpokeStack/Provider_For_R53_Lambda/framework-onEvent/LogRetention/Resource"
+      }
+    },
+    "LogRetentionaae0aa3c5b4d4f87b02d85b201efdd8aServiceRole9741ECFB": {
+      "Type": "AWS::IAM::Role",
+      "Properties": {
+        "AssumeRolePolicyDocument": {
+          "Statement": [
+            {
+              "Action": "sts:AssumeRole",
+              "Effect": "Allow",
+              "Principal": {
+                "Service": "lambda.amazonaws.com"
+              }
+            }
+          ],
+          "Version": "2012-10-17"
+        },
+        "ManagedPolicyArns": [
+          {
+            "Fn::Join": [
+              "",
+              [
+                "arn:",
+                {
+                  "Ref": "AWS::Partition"
+                },
+                ":iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+              ]
+            ]
+          }
+        ]
+      },
+      "Metadata": {
+        "aws:cdk:path": "ProServeApgCentralisedVpcEndpointsSpokeStack/LogRetentionaae0aa3c5b4d4f87b02d85b201efdd8a/ServiceRole/Resource"
+      }
+    },
+    "LogRetentionaae0aa3c5b4d4f87b02d85b201efdd8aServiceRoleDefaultPolicyADDA7DEB": {
+      "Type": "AWS::IAM::Policy",
+      "Properties": {
+        "PolicyDocument": {
+          "Statement": [
+            {
+              "Action": [
+                "logs:PutRetentionPolicy",
+                "logs:DeleteRetentionPolicy"
+              ],
+              "Effect": "Allow",
+              "Resource": "*"
+            }
+          ],
+          "Version": "2012-10-17"
+        },
+        "PolicyName": "LogRetentionaae0aa3c5b4d4f87b02d85b201efdd8aServiceRoleDefaultPolicyADDA7DEB",
+        "Roles": [
+          {
+            "Ref": "LogRetentionaae0aa3c5b4d4f87b02d85b201efdd8aServiceRole9741ECFB"
+          }
+        ]
+      },
+      "Metadata": {
+        "aws:cdk:path": "ProServeApgCentralisedVpcEndpointsSpokeStack/LogRetentionaae0aa3c5b4d4f87b02d85b201efdd8a/ServiceRole/DefaultPolicy/Resource"
+      }
+    },
+    "LogRetentionaae0aa3c5b4d4f87b02d85b201efdd8aFD4BFC8A": {
+      "Type": "AWS::Lambda::Function",
+      "Properties": {
+        "Handler": "index.handler",
+        "Runtime": "nodejs14.x",
+        "Code": {
+          "S3Bucket": {
+            "Ref": "AssetParameters67b7823b74bc135986aa72f889d6a8da058d0c4a20cbc2dfc6f78995fdd2fc24S3Bucket4D46ABB5"
+          },
+          "S3Key": {
+            "Fn::Join": [
+              "",
+              [
+                {
+                  "Fn::Select": [
+                    0,
+                    {
+                      "Fn::Split": [
+                        "||",
+                        {
+                          "Ref": "AssetParameters67b7823b74bc135986aa72f889d6a8da058d0c4a20cbc2dfc6f78995fdd2fc24S3VersionKeyB0F28861"
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "Fn::Select": [
+                    1,
+                    {
+                      "Fn::Split": [
+                        "||",
+                        {
+                          "Ref": "AssetParameters67b7823b74bc135986aa72f889d6a8da058d0c4a20cbc2dfc6f78995fdd2fc24S3VersionKeyB0F28861"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            ]
+          }
+        },
+        "Role": {
+          "Fn::GetAtt": [
+            "LogRetentionaae0aa3c5b4d4f87b02d85b201efdd8aServiceRole9741ECFB",
+            "Arn"
+          ]
+        }
+      },
+      "DependsOn": [
+        "LogRetentionaae0aa3c5b4d4f87b02d85b201efdd8aServiceRoleDefaultPolicyADDA7DEB",
+        "LogRetentionaae0aa3c5b4d4f87b02d85b201efdd8aServiceRole9741ECFB"
+      ],
+      "Metadata": {
+        "aws:cdk:path": "ProServeApgCentralisedVpcEndpointsSpokeStack/LogRetentionaae0aa3c5b4d4f87b02d85b201efdd8a/Resource"
+      }
+    },
+    "R53AssociateCustomResourceForSQS": {
+      "Type": "AWS::CloudFormation::CustomResource",
+      "Properties": {
+        "ServiceToken": {
+          "Fn::GetAtt": [
+            "ProviderForR53LambdaframeworkonEvent7454F6D5",
+            "Arn"
+          ]
+        },
+        "VPCID": {
+          "Ref": "VPCId"
+        },
+        "HostedZoneID": {
+          "Ref": "Route53DomainIDForSQS"
+        },
+        "AccountID": {
+          "Ref": "AWS::AccountId"
+        },
+        "RoleARN": {
+          "Ref": "R53HubRoleToAssume"
+        }
+      },
+      "UpdateReplacePolicy": "Delete",
+      "DeletionPolicy": "Delete",
+      "Metadata": {
+        "aws:cdk:path": "ProServeApgCentralisedVpcEndpointsSpokeStack/R53AssociateCustomResourceForSQS/Default"
+      }
+    },
+    "CDKMetadata": {
+      "Type": "AWS::CDK::Metadata",
+      "Properties": {
+        "Analytics": "v2:deflate64:H4sIAAAAAAAA/0WOQW/CMAyFfwv31FC4cGRU2mmHqvsFITVd1iaWYmcTivrfSQJsp/ee7Sd/LbT7Pew2J/3LjRnnbTIUENKnaDOr7up7HbRDwaDemFHyfLJ+Uh15lhCNlJsBmWIwqP5MF1nI/cerz4XRiiW/qvIqWe0gDbTUZdWeFmtu9Wd1q1q0u4wa0nv0plTL7uVXxYdGFySGSpYznKOZUc6aUS00MXzQNGR2/yiYCtWEJxVDH+jHjhhW1d/ki/z2AEdod5tvtrYJMdccwvDQO9JIzhgpAQAA"
+      },
+      "Metadata": {
+        "aws:cdk:path": "ProServeApgCentralisedVpcEndpointsSpokeStack/CDKMetadata/Default"
+      },
+      "Condition": "CDKMetadataAvailable"
+    }
+  },
+  "Conditions": {
+    "CDKMetadataAvailable": {
+      "Fn::Or": [
+        {
+          "Fn::Or": [
+            {
+              "Fn::Equals": [
+                {
+                  "Ref": "AWS::Region"
+                },
+                "af-south-1"
+              ]
+            },
+            {
+              "Fn::Equals": [
+                {
+                  "Ref": "AWS::Region"
+                },
+                "ap-east-1"
+              ]
+            },
+            {
+              "Fn::Equals": [
+                {
+                  "Ref": "AWS::Region"
+                },
+                "ap-northeast-1"
+              ]
+            },
+            {
+              "Fn::Equals": [
+                {
+                  "Ref": "AWS::Region"
+                },
+                "ap-northeast-2"
+              ]
+            },
+            {
+              "Fn::Equals": [
+                {
+                  "Ref": "AWS::Region"
+                },
+                "ap-south-1"
+              ]
+            },
+            {
+              "Fn::Equals": [
+                {
+                  "Ref": "AWS::Region"
+                },
+                "ap-southeast-1"
+              ]
+            },
+            {
+              "Fn::Equals": [
+                {
+                  "Ref": "AWS::Region"
+                },
+                "ap-southeast-2"
+              ]
+            },
+            {
+              "Fn::Equals": [
+                {
+                  "Ref": "AWS::Region"
+                },
+                "ca-central-1"
+              ]
+            },
+            {
+              "Fn::Equals": [
+                {
+                  "Ref": "AWS::Region"
+                },
+                "cn-north-1"
+              ]
+            },
+            {
+              "Fn::Equals": [
+                {
+                  "Ref": "AWS::Region"
+                },
+                "cn-northwest-1"
+              ]
+            }
+          ]
+        },
+        {
+          "Fn::Or": [
+            {
+              "Fn::Equals": [
+                {
+                  "Ref": "AWS::Region"
+                },
+                "eu-central-1"
+              ]
+            },
+            {
+              "Fn::Equals": [
+                {
+                  "Ref": "AWS::Region"
+                },
+                "eu-north-1"
+              ]
+            },
+            {
+              "Fn::Equals": [
+                {
+                  "Ref": "AWS::Region"
+                },
+                "eu-south-1"
+              ]
+            },
+            {
+              "Fn::Equals": [
+                {
+                  "Ref": "AWS::Region"
+                },
+                "eu-west-1"
+              ]
+            },
+            {
+              "Fn::Equals": [
+                {
+                  "Ref": "AWS::Region"
+                },
+                "eu-west-2"
+              ]
+            },
+            {
+              "Fn::Equals": [
+                {
+                  "Ref": "AWS::Region"
+                },
+                "eu-west-3"
+              ]
+            },
+            {
+              "Fn::Equals": [
+                {
+                  "Ref": "AWS::Region"
+                },
+                "me-south-1"
+              ]
+            },
+            {
+              "Fn::Equals": [
+                {
+                  "Ref": "AWS::Region"
+                },
+                "sa-east-1"
+              ]
+            },
+            {
+              "Fn::Equals": [
+                {
+                  "Ref": "AWS::Region"
+                },
+                "us-east-1"
+              ]
+            },
+            {
+              "Fn::Equals": [
+                {
+                  "Ref": "AWS::Region"
+                },
+                "us-east-2"
+              ]
+            }
+          ]
+        },
+        {
+          "Fn::Or": [
+            {
+              "Fn::Equals": [
+                {
+                  "Ref": "AWS::Region"
+                },
+                "us-west-1"
+              ]
+            },
+            {
+              "Fn::Equals": [
+                {
+                  "Ref": "AWS::Region"
+                },
+                "us-west-2"
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  }
+}
