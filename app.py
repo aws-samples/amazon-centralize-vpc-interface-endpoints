@@ -9,19 +9,26 @@ from aws_cdk import core as cdk
 # being updated to use `cdk`.  You may delete this import if you don't need it.
 from aws_cdk import core
 
-from pro_serve_apg_centralised_vpc_endpoints.pro_serve_apg_centralised_vpc_endpoints_stack import ProServeApgCentralisedVpcEndpointsHubStack, ProServeApgCentralisedVpcEndpointsSpokeStack
+from pro_serve_apg_centralised_vpc_endpoints.pro_serve_apg_centralised_vpc_endpoints_stack import (
+    ProServeApgCentralisedVpcEndpointsHubStack,
+    ProServeApgCentralisedVpcEndpointsSpokeStack,
+)
 
 
 app = core.App()
 
-services =  ["sqs"]
-#services =  ["ssm","ec2messages","ec2","ssmmessages","kms"]
+services = ["sqs"]
+# services =  ["ssm","ec2messages","ec2","ssmmessages","kms"]
 
 hub_env = core.Environment()
 spoke_env = core.Environment()
 
 
-ProServeApgCentralisedVpcEndpointsHubStack(app, "ProServeApgCentralisedVpcEndpointsHubStack",    services=services, env=hub_env)
-ProServeApgCentralisedVpcEndpointsSpokeStack(app, "ProServeApgCentralisedVpcEndpointsSpokeStack",services=services,  env=spoke_env  )
+ProServeApgCentralisedVpcEndpointsHubStack(
+    app, "ProServeApgCentralisedVpcEndpointsHubStack", services=services, env=hub_env
+)
+ProServeApgCentralisedVpcEndpointsSpokeStack(
+    app, "ProServeApgCentralisedVpcEndpointsSpokeStack", services=services, env=spoke_env
+)
 
 app.synth()
