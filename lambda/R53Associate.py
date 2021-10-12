@@ -1,4 +1,5 @@
-import os, boto3, json
+import os
+import boto3
 import logging
 
 logger = logging.getLogger("__name__")

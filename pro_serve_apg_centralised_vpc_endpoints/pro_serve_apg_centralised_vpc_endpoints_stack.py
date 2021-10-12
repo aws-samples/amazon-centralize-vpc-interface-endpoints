@@ -5,19 +5,11 @@ from aws_cdk import (
     core,
     aws_ec2 as ec2,
     aws_route53 as route53,
-    aws_route53_targets as targets,
     aws_lambda as _lambda,
     aws_iam as iam,
     aws_logs as logs,
 )
 
-
-from aws_cdk.custom_resources import (
-    AwsCustomResource,
-    AwsCustomResourcePolicy,
-    PhysicalResourceId,
-    AwsSdkCall,
-)
 import aws_cdk.custom_resources as custom_resources
 import jsii
 
@@ -38,7 +30,7 @@ class ProServeApgCentralisedVpcEndpointsHubStack(cdk.Stack):
             self,
             "OrgCIDR",
             description="The CIDR range that requests can originate from to use this endpoint.",
-            allowed_pattern="^[\d]{1,3}\.[\d]{1,3}\.[\d]{1,3}\.[\d]{1,3}\/[\d]{1,3}$",
+            allowed_pattern=r"^[\d]{1,3}\.[\d]{1,3}\.[\d]{1,3}\.[\d]{1,3}\/[\d]{1,3}$",
             constraint_description="CIDR should be in form X.X.X.X/X",
         ).value_as_string
 
@@ -113,7 +105,7 @@ class ProServeApgCentralisedVpcEndpointsHubStack(cdk.Stack):
             )
 
             core.CfnOutput(self, f"Route53DomainIDFor{service.upper()}", value=hosted_zone.hosted_zone_id)
-        core.CfnOutput(self, f"R53HubRoleToAssume", value=r53_role.role_arn)
+        core.CfnOutput(self, "R53HubRoleToAssume", value=r53_role.role_arn)
 
 
 class ProServeApgCentralisedVpcEndpointsSpokeStack(cdk.Stack):
@@ -130,9 +122,9 @@ class ProServeApgCentralisedVpcEndpointsSpokeStack(cdk.Stack):
 
         assume_role_arn = core.CfnParameter(
             self,
-            f"R53HubRoleToAssume",
-            description=f"The Route53 Role in the Hub Account that allows us to Authorize a VPC to the Private Hosted Zone",
-            allowed_pattern="^arn:aws:iam::[\d]{12}:role/.*$",
+            "R53HubRoleToAssume",
+            description="The R53 Role in the Hub Account that allows us to Authorize a VPC to the Private Hosted Zone",
+            allowed_pattern=r"^arn:aws:iam::[\d]{12}:role/.*$",
         ).value_as_string
 
         # R53Lambda Role
@@ -168,7 +160,7 @@ class ProServeApgCentralisedVpcEndpointsSpokeStack(cdk.Stack):
 
         R53_Lambda = _lambda.Function(
             self,
-            f"R53AuthenticateAssociateVPC",
+            "R53AuthenticateAssociateVPC",
             runtime=_lambda.Runtime.PYTHON_3_7,
             code=_lambda.Code.from_asset("lambda"),
             handler="R53Associate.handler",
@@ -183,10 +175,11 @@ class ProServeApgCentralisedVpcEndpointsSpokeStack(cdk.Stack):
 
         # The list of services are in the app.py file
         for service in services:
-            service_HostedZoneID = core.CfnParameter(
+            service_hosted_zone_id = core.CfnParameter(
                 self,
                 f"Route53DomainIDFor{service.upper()}",
-                description=f"The route53 hosted zone id from the hub stack for the the {service.upper()} service, the string before the colon in <route53 hosted zone id>:<regional vpc endpoint dns name>",
+                description=f"The route53 hosted zone id from the hub stack for the the {service.upper()} service, \
+                    the string before the colon in <route53 hosted zone id>:<regional vpc endpoint dns name>",
                 allowed_pattern="^[A-Z0-9]{1,32}$",
             ).value_as_string
 
@@ -196,7 +189,7 @@ class ProServeApgCentralisedVpcEndpointsSpokeStack(cdk.Stack):
                 service_token=provider_for_r53_lambda.service_token,
                 properties={
                     "VPCID": vpc_id,
-                    "HostedZoneID": service_HostedZoneID,
+                    "HostedZoneID": service_hosted_zone_id,
                     "AccountID": core.Aws.ACCOUNT_ID,
                     "RoleARN": assume_role_arn,
                 },
