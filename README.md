@@ -61,19 +61,10 @@ services =  ["ssm","ec2messages","ec2","ssmmessages","kms"]
 At this point you can now synthesize the CloudFormation template for this code.
 
 ```
-<<<<<<< HEAD
-cdk synth
-=======
-$ cdk synth
->>>>>>> 3890023... Update README.md
-```
-
 To add additional dependencies, for example other CDK libraries, just add
 them to your `setup.py` file and rerun the `pip install -r requirements.txt`
 command.
 
-<<<<<<< HEAD
-<<<<<<< HEAD
 Finally to install the Services Hub VPC Cloudformation Template
 =======
 ## Deployment
@@ -90,11 +81,6 @@ cdk deploy <Stack-Name> --parameters VPCId=vpc-xxxxxxxxx \
    --parameters OrgID=o-xxxxxxxxxx
 >>>>>>> a5da684746abfa5f0cefb344fbf994668223d644
 ```
-
-<<<<<<< HEAD
-=======
->>>>>>> 3890023... Update README.md
-=======
 To install the Services **Spoke** VPC Cloudformation Template, use the following command with these parameters (with the Spoke Credentials):
 * VPCId = VPC to associate to the Hub's PHZ 
 * R53HubRoleToAssume = Route53 Hub Role to Assume for Authenticating the VPC against the PHZ, provided from the output of the Hub
@@ -105,7 +91,6 @@ cdk deploy <Stack-Name> --parameters VPCId=vpc-xxxxxxxxx \
   --parameters Route53DomainIDFor<Service1>=xxxxxxxxxxxxxxxxxxxxx \
   --parameters Route53DomainIDFor<Service2>=xxxxxxxxxxxxxxxxxxxxx, etc.
 ```  
->>>>>>> a5da684746abfa5f0cefb344fbf994668223d644
 ### Useful commands
 
  * `cdk ls`          list all stacks in the app
