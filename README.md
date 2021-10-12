@@ -70,7 +70,6 @@ cdk deploy <Stack-Name> --parameters VPCId=vpc-xxxxxxxxx \
    --parameters OrgCIDR=xx.xx.xx.xx/xx \
    --parameters EndpointSubnetIdList="subnet-xxxxxxxxx, subnet-xxxxxxxxxx, subnet-xxxxxxx"  \
    --parameters OrgID=o-xxxxxxxxxx
->>>>>>> a5da684746abfa5f0cefb344fbf994668223d644
 ```
 cdk deploy <Stack-Name> ProServeApgCentralisedVpcEndpointsHubStack --parameters VPCId=vpc-xxxxxxxxx --parameters OrgCIDR=xx.xx.xx.xx/xx --parameters EndpointSubnetIdList="subnet-xxxxxxxxx, subnet-xxxxxxxxxx, subnet-xxxxxxx"
 ```
