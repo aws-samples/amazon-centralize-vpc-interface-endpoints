@@ -4,10 +4,7 @@ import logging
 logger = logging.getLogger("__name__")
 logger.setLevel(os.environ.get("LOG_LEVEL", logging.INFO))
 r53_client = boto3.client('route53')
-
-logger = logging.getLogger("__name__")
-logger.setLevel(os.environ.get("LOG_LEVEL", logging.INFO))
-r53_client = boto3.client('route53')
+sts_connection = boto3.client('sts')
 
 def handler(event, context):
     logger.info("custom resource triggered by {} request type: {}".format(event.get('StackId'), event.get('RequestType')))
@@ -28,21 +25,11 @@ def handler(event, context):
     if request_type == 'Delete': return disassociate_vpc_from_hosted_zone(vpc_id, phz_id)
     raise Exception("Invalid request type: %s" % request_type)
 
-def parameters(vpc_id, phz_id):
-    return dict(
-        HostedZoneId=phz_id,
-        VPC={
-            'VPCRegion': os.environ['AWS_REGION'],
-            'VPCId': vpc_id
-        }
-    )
-
 def authenticate_and_associate_vpc_to_hosted_zone(vpc_id, phz_id, account_id, RoleArn):
     # Authenticate the VPC to the PHZ
         try:
             # Assume a Role in Hub
             logger.info ("Assuming Role in Hub")
-            sts_connection = boto3.client('sts')
             acct_b = sts_connection.assume_role(
                 RoleArn=RoleArn,
                 RoleSessionName="cross_acct_lambda"
@@ -71,6 +58,7 @@ def authenticate_and_associate_vpc_to_hosted_zone(vpc_id, phz_id, account_id, Ro
             logger.info("authorization is complete :\n {}".format(response))
         except Exception as ex:
             logger.error("Error authorizing %s to hosted zone %s : %s", vpc_id, phz_id, ex, exc_info=True)
+            raise ex
 
         # Authorize the VPC to the PHZ
         try:
@@ -86,6 +74,7 @@ def authenticate_and_associate_vpc_to_hosted_zone(vpc_id, phz_id, account_id, Ro
             logger.info("association is complete : \n {}".format(response))
         except Exception as ex:
             logger.error("Error associating %s to hosted zone %s : %s", vpc_id, phz_id, ex, exc_info=True)
+            raise ex
 
 def disassociate_vpc_from_hosted_zone(vpc_id, phz_id):
         try:
@@ -100,3 +89,4 @@ def disassociate_vpc_from_hosted_zone(vpc_id, phz_id):
             logger.info("disassociation is complete : \n {}".format(response))
         except Exception as ex:
             logger.error("Error disassociation %s to hosted zone %s : %s", vpc_id, phz_id, ex, exc_info=True)
+            raise ex
