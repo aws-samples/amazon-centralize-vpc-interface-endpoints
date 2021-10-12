@@ -45,7 +45,7 @@ class ProServeApgCentralisedVpcEndpointsHubStack(cdk.Stack):
         subnet_ids = core.CfnParameter(
             self, "EndpointSubnetIdList", type="List<AWS::EC2::Subnet::Id>", description="The subnets to insert VPC endpoints into", 
             min_length=1,
-            allowed_pattern="^subnet.*$",
+            allowed_pattern="^subnet-.*$",
         ).value_as_list
 
         vpc = ec2.Vpc.from_vpc_attributes(
@@ -116,7 +116,7 @@ class ProServeApgCentralisedVpcEndpointsSpokeStack(cdk.Stack):
             allowed_pattern="^vpc-.*$",
         ).value_as_string
         
-        AssumeRoleARN = core.CfnParameter(
+        assume_role_arn = core.CfnParameter(
             self,
             f"R53HubRoleToAssume",
             description=f"The Route53 Role in the Hub Account that allows us to Authorize a VPC to the Private Hosted Zone",
@@ -124,19 +124,19 @@ class ProServeApgCentralisedVpcEndpointsSpokeStack(cdk.Stack):
         ).value_as_string
 
         #R53Lambda Role
-        AssociateVPC_Lambda_Role = iam.Role(self, "AssociateVPC_Lambda_Role",
+        associate_vpc_lambda_role = iam.Role(self, "associate_vpc_lambda_role",
             assumed_by=iam.ServicePrincipal("lambda.amazonaws.com")
         )
-        AssociateVPC_Lambda_Role.add_managed_policy(iam.ManagedPolicy.from_aws_managed_policy_name("service-role/AWSLambdaBasicExecutionRole"))
-        AssociateVPC_Lambda_Role.add_managed_policy(iam.ManagedPolicy.from_aws_managed_policy_name("service-role/AWSLambdaVPCAccessExecutionRole"))
+        associate_vpc_lambda_role.add_managed_policy(iam.ManagedPolicy.from_aws_managed_policy_name("service-role/AWSLambdaBasicExecutionRole"))
+        associate_vpc_lambda_role.add_managed_policy(iam.ManagedPolicy.from_aws_managed_policy_name("service-role/AWSLambdaVPCAccessExecutionRole"))
             
         # Add permissions to the Lambda Role for R53 and AssumeRole
-        AssociateVPC_Lambda_Role.add_to_policy(iam.PolicyStatement(
+        associate_vpc_lambda_role.add_to_policy(iam.PolicyStatement(
             effect=iam.Effect.ALLOW,
             resources=["*"],
             actions=["ec2:DescribeVpcs"]
         ))
-        AssociateVPC_Lambda_Role.add_to_policy(iam.PolicyStatement(
+        associate_vpc_lambda_role.add_to_policy(iam.PolicyStatement(
             effect=iam.Effect.ALLOW,
             resources=["arn:aws:route53:::hostedzone/*", f"arn:aws:ec2:{core.Aws.REGION}:{core.Aws.ACCOUNT_ID}:vpc/{vpc_id}"],
             actions=["route53:AssociateVPCWithHostedZone","route53:DisassociateVPCFromHostedZone"]
@@ -144,9 +144,9 @@ class ProServeApgCentralisedVpcEndpointsSpokeStack(cdk.Stack):
 
 
         # Add permissions to the Lambda Role for Assume Role
-        AssociateVPC_Lambda_Role.add_to_policy(iam.PolicyStatement(
+        associate_vpc_lambda_role.add_to_policy(iam.PolicyStatement(
             effect=iam.Effect.ALLOW,
-            resources=[AssumeRoleARN],
+            resources=[assume_role_arn],
             actions=["sts:AssumeRole"]
         ))
 
@@ -155,9 +155,9 @@ class ProServeApgCentralisedVpcEndpointsSpokeStack(cdk.Stack):
             runtime=_lambda.Runtime.PYTHON_3_7,
             code=_lambda.Code.from_asset('lambda'),
             handler='R53Associate.handler',
-            role=AssociateVPC_Lambda_Role
+            role=associate_vpc_lambda_role
         )
-        my_provider = custom_resources.Provider(self, "MyProviderFor R53_Lambda",
+        provider_for_r53_lambda = custom_resources.Provider(self, "Provider_For_R53_Lambda",
         on_event_handler=R53_Lambda,
         log_retention=logs.RetentionDays.ONE_DAY, # default is INFINITE
         )
@@ -172,12 +172,12 @@ class ProServeApgCentralisedVpcEndpointsSpokeStack(cdk.Stack):
             ).value_as_string
 
             R53CustomResource = core.CustomResource(self, f"R53AssociateCustomResourceFor{service.upper()}", 
-                service_token=my_provider.service_token, 
+                service_token=provider_for_r53_lambda.service_token, 
                 properties={
                     "VPCID": vpc_id ,
                     "HostedZoneID": service_HostedZoneID,
                     "AccountID": core.Aws.ACCOUNT_ID,
-                    "RoleARN": AssumeRoleARN
+                    "RoleARN": assume_role_arn
                 },
             )
 
