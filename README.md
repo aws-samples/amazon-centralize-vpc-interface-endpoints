@@ -71,8 +71,6 @@ cdk deploy <Stack-Name> --parameters VPCId=vpc-xxxxxxxxx \
    --parameters EndpointSubnetIdList="subnet-xxxxxxxxx, subnet-xxxxxxxxxx, subnet-xxxxxxx"  \
    --parameters OrgID=o-xxxxxxxxxx
 ```
-cdk deploy <Stack-Name> ProServeApgCentralisedVpcEndpointsHubStack --parameters VPCId=vpc-xxxxxxxxx --parameters OrgCIDR=xx.xx.xx.xx/xx --parameters EndpointSubnetIdList="subnet-xxxxxxxxx, subnet-xxxxxxxxxx, subnet-xxxxxxx"
-```
 
 To install the Services **Spoke** VPC Cloudformation Template, use the following command with these parameters (with the Spoke Credentials):
 * VPCId = VPC to associate to the Hub's PHZ 
