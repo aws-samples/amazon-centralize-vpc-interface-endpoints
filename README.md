@@ -75,7 +75,6 @@ cdk deploy <Stack-Name> --parameters VPCId=vpc-xxxxxxxxx \
 cdk deploy <Stack-Name> ProServeApgCentralisedVpcEndpointsHubStack --parameters VPCId=vpc-xxxxxxxxx --parameters OrgCIDR=xx.xx.xx.xx/xx --parameters EndpointSubnetIdList="subnet-xxxxxxxxx, subnet-xxxxxxxxxx, subnet-xxxxxxx"
 ```
 
-=======
 To install the Services **Spoke** VPC Cloudformation Template, use the following command with these parameters (with the Spoke Credentials):
 * VPCId = VPC to associate to the Hub's PHZ 
 * R53HubRoleToAssume = Route53 Hub Role to Assume for Authenticating the VPC against the PHZ, provided from the output of the Hub
@@ -86,7 +85,6 @@ cdk deploy <Stack-Name> --parameters VPCId=vpc-xxxxxxxxx \
   --parameters Route53DomainIDFor<Service1>=xxxxxxxxxxxxxxxxxxxxx \
   --parameters Route53DomainIDFor<Service2>=xxxxxxxxxxxxxxxxxxxxx, etc.
 ```  
->>>>>>> a5da684746abfa5f0cefb344fbf994668223d644
 ### Useful commands
 
  * `cdk ls`          list all stacks in the app
