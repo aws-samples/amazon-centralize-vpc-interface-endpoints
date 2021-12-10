@@ -22,9 +22,15 @@
 # being updated to use `cdk`.  You may delete this import if you don't need it.
 from aws_cdk import core
 
+<<<<<<< HEAD
 from centralized_vpc_endpoints.centralized_vpc_endpoints_stack import (
     CentralizedVpcEndpointsHubStack,
     CentralizedVpcEndpointsSpokeStack,
+=======
+from pro_serve_apg_centralised_vpc_endpoints.pro_serve_apg_centralised_vpc_endpoints_stack import (
+    ProServeApgCentralisedVpcEndpointsHubStack,
+    ProServeApgCentralisedVpcEndpointsSpokeStack,
+>>>>>>> 180bbaecb67457c6288bb7eb7861dc2608c316d3
 )
 
 
@@ -37,11 +43,19 @@ hub_env = core.Environment()
 spoke_env = core.Environment()
 
 
+<<<<<<< HEAD
 CentralizedVpcEndpointsHubStack(
     app, "CentralizedVpcEndpointsHubStack", services=services, env=hub_env
 )
 CentralizedVpcEndpointsSpokeStack(
     app, "CentralizedVpcEndpointsSpokeStack", services=services, env=spoke_env
+=======
+ProServeApgCentralisedVpcEndpointsHubStack(
+    app, "ProServeApgCentralisedVpcEndpointsHubStack", services=services, env=hub_env
+)
+ProServeApgCentralisedVpcEndpointsSpokeStack(
+    app, "ProServeApgCentralisedVpcEndpointsSpokeStack", services=services, env=spoke_env
+>>>>>>> 180bbaecb67457c6288bb7eb7861dc2608c316d3
 )
 
 app.synth()
