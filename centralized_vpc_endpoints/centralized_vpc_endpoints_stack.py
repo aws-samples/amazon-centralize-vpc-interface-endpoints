@@ -31,7 +31,7 @@ import aws_cdk.custom_resources as custom_resources
 import jsii
 
 
-class ProServeApgCentralisedVpcEndpointsHubStack(cdk.Stack):
+class CentralizedVpcEndpointsHubStack(cdk.Stack):
     def __init__(self, scope: cdk.Construct, construct_id: str, services, **kwargs) -> None:
         super().__init__(scope, construct_id, **kwargs)
 
@@ -125,7 +125,7 @@ class ProServeApgCentralisedVpcEndpointsHubStack(cdk.Stack):
         core.CfnOutput(self, "R53HubRoleToAssume", value=r53_role.role_arn)
 
 
-class ProServeApgCentralisedVpcEndpointsSpokeStack(cdk.Stack):
+class CentralizedVpcEndpointsSpokeStack(cdk.Stack):
     def __init__(self, scope: cdk.Construct, construct_id: str, services: List, **kwargs) -> None:
         super().__init__(scope, construct_id, **kwargs)
 
