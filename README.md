@@ -2,11 +2,7 @@
 
 Security and cost are always a top priority for AWS customers when designing their network. Amazon Virtual Private Cloud (Amazon VPC),  and it’s related networking components, offer many tools for implementing network connectivity. One such tool is VPC endpoints. Powered by AWS PrivateLink, VPC endpoints are private connections between your VPC and another AWS service without sending traffic over the internet, through a NAT instance, a VPN connection, or AWS Direct Connect. In this blog post, I present hub and spoke design where all the spoke VPCs use an interface VPC endpoint provisioned inside the hub (shared services) VPC. This architecture may help reduce the cost and maintenance for multiple interface VPC endpoints across different VPCs.
 
-<<<<<<< HEAD
 This code has been created to complement the blog https://aws.amazon.com/blogs/networking-and-content-delivery/centralize-access-using-vpc-interface-endpoints/
-=======
-This code has been created to compliment the blog https://aws.amazon.com/blogs/networking-and-content-delivery/centralize-access-using-vpc-interface-endpoints/
->>>>>>> 180bbaecb67457c6288bb7eb7861dc2608c316d3
 
 ## Installation
 
@@ -38,11 +34,7 @@ If you are a Windows platform, you would activate the virtualenv like this:
 % .venv\Scripts\activate.bat
 ```
 
-<<<<<<< HEAD
-Once the virtualenv is activated, you can install the required dependencies.cat 
-=======
 Once the virtualenv is activated, you can install the required dependencies.
->>>>>>> 180bbaecb67457c6288bb7eb7861dc2608c316d3
 
 ```
 pip install -r requirements.txt
@@ -83,11 +75,7 @@ cdk deploy <Stack-Name> --parameters VPCId=vpc-xxxxxxxxx \
 To install the Services **Spoke** VPC Cloudformation Template, use the following command with these parameters (with the Spoke Credentials):
 * VPCId = VPC to associate to the Hub's PHZ 
 * R53HubRoleToAssume = Route53 Hub Role to Assume for Authenticating the VPC against the PHZ, provided from the output of the Hub
-<<<<<<< HEAD
 * Route53DomainIDFor<Service1> = Route53 PHZ Domain ID to Authenticate and Associate against, 1 per Service, provided from the output of the Hub
-=======
-* Route53DomainIDFor<Service1> = Route53 PHZ Domain ID to Authenticate and Associate against, 1 per Servuce, provided from the output of the Hub
->>>>>>> 180bbaecb67457c6288bb7eb7861dc2608c316d3
 ```
 cdk deploy <Stack-Name> --parameters VPCId=vpc-xxxxxxxxx \
   --parameters R53HubRoleToAssume=arn:aws:iam::xxxxxxxxxxxx:role/xxxxxxxxxxxx \
